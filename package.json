@@ -1,0 +1,32 @@
+{
+    "name": "url-toolbox",
+    "version": "0.0.1",
+    "description": "Collection of simple tools to handle urls",
+    "author": "Nebulaevo",
+    "license": "MIT",
+    "keywords": [],
+    "type": "module",
+    "main": "dist/index.js",
+    "types": "dist/index.d.ts",
+    "scripts": {
+        "test": "vitest",
+        "build": "tsc --build --clean && tsc",
+        "prepare": "npm run build"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/Nebulaevo/url-toolbox.git"
+    },
+    "bugs": {
+        "url": "https://github.com/Nebulaevo/url-toolbox/issues"
+    },
+    "homepage": "https://github.com/Nebulaevo/url-toolbox#readme",
+    "devDependencies": {
+        "@types/node": "^24.5.2",
+        "typescript": "^5.9.2",
+        "vitest": "^3.2.4"
+    },
+    "dependencies": {
+        "sniffly": "^1.0.2"
+    }
+}
