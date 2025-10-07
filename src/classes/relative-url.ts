@@ -1,10 +1,8 @@
 
-import { isArray, isDict, isString, type Dict_T } from "sniffly"
+import tools from '../purification/tools.js'
+import { assembleUrlParts } from '../utils/url-parts.js'
 
-import { purifyRelativeUrlPieces, buildPathFromUrlPieces } from '../utils/shortcuts.js'
-import UrlPurifyTools from '../utils/tools.js'
 import AbsoluteURL from "./absolute-url.js"
-import { url } from "inspector"
 
 
 class RelativeURL extends AbsoluteURL {
@@ -23,26 +21,26 @@ class RelativeURL extends AbsoluteURL {
         return URL.canParse(url, RelativeURL.BASE)
     }
 
-    static fromPieces(kwargs: {
-        url: RelativeURL.UrlPieces_T, 
-        purifyOpts?: AbsoluteURL.PurifyOptions_T
+    static fromParts(kwargs: {
+        urlParts: RelativeURL.UrlParts_T, 
+        purifyOpts?: RelativeURL.PurifyOptions_T
     }): RelativeURL | null {
         
         const purify = kwargs.purifyOpts?.purify ?? false
-        let urlPieces = kwargs.url
+        let { urlParts } = kwargs
 
         if (purify) {
-            const purifiedRelativePieces = purifyRelativeUrlPieces({
-                pathname: urlPieces.pathname,
-                search: urlPieces.search,
-                hash: urlPieces.hash,
+            const purifiedRelativePieces = tools.purifyTailParts({
+                pathname: urlParts.pathname,
+                search: urlParts.search,
+                hash: urlParts.hash,
             })
             if (!purifiedRelativePieces) return null
-
-            urlPieces = purifiedRelativePieces
+            
+            urlParts = purifiedRelativePieces
         }
 
-        const path = buildPathFromUrlPieces(urlPieces)
+        const path = assembleUrlParts(urlParts)
         
         try {
             const url = new this(path)
@@ -103,9 +101,9 @@ namespace RelativeURL {
         purify: boolean
     }
 
-    export type UrlPieces_T = Omit<
-        AbsoluteURL.UrlPieces_T, 
-        'protocol' | 'host'
+    export type UrlParts_T = Pick<
+        AbsoluteURL.UrlParts_T, 
+        'pathname' | 'search' | 'hash'
     >
 }
 

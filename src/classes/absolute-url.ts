@@ -1,48 +1,39 @@
-import type  { Dict_T } from 'sniffly'
+import  { isString, type Dict_T } from 'sniffly'
 
-import { buildPathFromUrlPieces, purifyBaseUrlPieces, purifyRelativeUrlPieces } from '../utils/shortcuts.js'
+import tools from '../purification/tools.js'
+import helpers from '../purification/helpers.js'
+import { assembleUrlParts } from '../utils/url-parts.js'
+
+import URLInstancePurifier from './url-instance-purifier.js'
 import UrlRepr from './url-repr.js'
 
 
 class AbsoluteURL extends URL {
+
+    // Utility sub classes
+    #purify: URLInstancePurifier | undefined
     #as: UrlRepr | undefined
 
-    static fromPieces(kwargs: {
-        url: AbsoluteURL.UrlPieces_T, 
-        purifyOpts?: AbsoluteURL.PurifyOptions_T
+    static fromParts(kwargs: {
+        urlParts: AbsoluteURL.UrlParts_T, 
+        purifyOpts?: AbsoluteURL.OptionalPurifyOptions_T
     }): AbsoluteURL | null {
-
+        
         const {
             purify = false,
-            ...purificationOpts
+            ...purifyOpts
         } = kwargs.purifyOpts ?? {}
 
-        let urlPieces = kwargs.url
+        let urlParts = kwargs.urlParts
 
         if (purify) {
-            const purifiedBasePieces = purifyBaseUrlPieces(
-                {
-                    protocol: urlPieces.protocol,
-                    host: urlPieces.host,
-                }, 
-                purificationOpts
-            )
-            if (!purifiedBasePieces) return null
-
-            const purifiedRelativePieces = purifyRelativeUrlPieces({
-                pathname: urlPieces.pathname,
-                search: urlPieces.search,
-                hash: urlPieces.hash,
-            })
-            if (!purifiedRelativePieces) return null
-
-            urlPieces = {
-                ...purifiedBasePieces,
-                ...purifiedRelativePieces,
-            }
+            const purifiedParts: tools.ForceSearchType_T<typeof urlParts> | null = tools.purifyParts(urlParts, purifyOpts)
+            if (!purifiedParts) return null
+            
+            urlParts = purifiedParts
         }
 
-        const path = buildPathFromUrlPieces(urlPieces)
+        const path = assembleUrlParts(urlParts)
 
         try {
             const url = new this(path)
@@ -52,21 +43,44 @@ class AbsoluteURL extends URL {
         }
     }
 
-    /** Returns an instance of UrlRepr allowing to get different representations of the URL */
+    /** Returns an instance of UrlRepr 
+     * allowing to get different representations of the URL 
+     * 
+     * (The UrlRepr instance is built on demand)
+    */
     get as(): UrlRepr {
         if (!this.#as) this.#as = new UrlRepr(this)
         return this.#as
     }
+
+    /** Returns a collection of purification helpers for the current instance 
+     * 
+     * (The URLInstancePurifier is built on demand)
+    */
+    get purify(){
+        if (!this.#purify) {
+            this.#purify = new URLInstancePurifier(this)
+        }
+        return this.#purify
+    }
 }
 
 namespace AbsoluteURL {
+    
     export type PurifyOptions_T = {
-        purify: boolean,
         allowedProtocols?: string[],
         allowedHosts?: string[],
     }
+
+    export type InstancePurifyOptions_T = PurifyOptions_T & {
+        allowCredentials?: boolean,
+    }
     
-    export type UrlPieces_T = {
+    export type OptionalPurifyOptions_T = PurifyOptions_T & {
+        purify: boolean
+    }
+
+    export type UrlParts_T = {
         protocol: string,
         host: string,
         pathname?: string[],

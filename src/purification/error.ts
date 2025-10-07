@@ -5,4 +5,4 @@ class UrlPurificationFailed extends Error {
     }
 }
 
-export { UrlPurificationFailed }
+export default UrlPurificationFailed
