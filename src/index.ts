@@ -1,12 +1,12 @@
-import AbsoluteURL from "./classes/absolute-url.js"
-import RelativeURL from "./classes/relative-url.js"
+import AbsoluteURL from "./old/classes/absolute-url.js"
+import RelativeURL from "./old/classes/relative-url.js"
 
-import URLInstancePurifier from './classes/url-instance-purifier.js'
-import UrlRepr from "./classes/url-repr.js"
+import URLInstancePurifier from './old/classes/url-instance-purifier.js'
+import UrlRepr from "./old/classes/url-repr.js"
 
-import urlPurifyTools from './purification/tools.js'
+import urlPurifyTools from './old/purification/tools.js'
 
-import { assemblePathnameSections, assembleUrlParts } from "./utils/url-parts.js"
+import { assemblePathnameSections, assembleUrlParts } from "./old/utils/url-parts.js"
 
 
 type EnhancedURL_T = AbsoluteURL | RelativeURL
