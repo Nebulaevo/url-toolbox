@@ -6,7 +6,7 @@ import UrlRepr from "./url-repr.js"
 import { canParseXUrl } from "./utils/can-parse.js"
 
 
-/** Class Extending URL to add optionnal restrictions and representation utils */
+/** Class extending URL to add optionnal restrictions and representation utils */
 class XUrl extends URL {
     #restrictions: XUrl.UrlRestrictions_T 
     #as?: UrlRepr
