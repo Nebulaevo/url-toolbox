@@ -1,16 +1,15 @@
 import { canParsePolyfill } from "./utils/can-parse.js"
-import XUrl from "./xurl.js"
 
+import _ExtendedUrlBase from "./base-url.js"
 
-
-/** Utility class to generate relative http url 
+/** Class extending URL to generate base-less http urls 
  * 
  * ℹ️ This class overrides / prevents access to the url base values.
 */
-class RelativeUrl extends XUrl {
+class RelativeUrl extends _ExtendedUrlBase {
 
     static #DUMMY_PROTOCOL = 'http:'
-    static #DUMMY_HOST = 'relative-url.notatld'
+    static #DUMMY_HOST = 'relative-url.NotATld'
     static #DUMMY_ORIGIN = `${RelativeUrl.#DUMMY_PROTOCOL}//${RelativeUrl.#DUMMY_HOST}`
 
     static parse(url: string|URL) {

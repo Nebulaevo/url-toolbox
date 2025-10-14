@@ -1,15 +1,13 @@
 import { isArray, isBool } from "sniffly"
 
-import { buildPathnameFromArray } from "./utils/pathname.js"
 import { checkProtocol, checkHost, checkCredentials } from "./utils/restrictions.js"
-import UrlRepr from "./url-repr.js"
 import { canParseXUrl } from "./utils/can-parse.js"
 
+import _ExtendedUrlBase from "./base-url.js"
 
 /** Class extending URL to add optionnal restrictions and representation utils */
-class XUrl extends URL {
+class XUrl extends _ExtendedUrlBase {
     #restrictions: XUrl.UrlRestrictions_T 
-    #as?: UrlRepr
 
     /** Static method returning a new `XUrl` instance created from the given parameters, or `null` if parsing or restrictions failed */
     static parse(url: string|URL, base?: string|URL, restrictions?: Partial<XUrl.UrlRestrictions_T>) {
@@ -36,30 +34,6 @@ class XUrl extends URL {
         // will throw a BrokenUrlRestrictionError 
         // if restrictions on protocol or host are not respected
         this.setRestrictions(restrictions)
-    }
-    
-    /** Shortcut method allowing to set pathname from an array of strings 
-     * 
-     * (each given segment is encoded and inserted in the path)
-    */
-    setPathnameSegments(pathSegments: string[]) {
-        if (!isArray(pathSegments, {itemType:'string'})) {
-            throw new TypeError(
-                'XUrl setPathnameSegments accepts only string[] type values'
-            )
-        }
-
-        this.pathname = buildPathnameFromArray(pathSegments)
-    }
-
-    /** Returns an instance of UrlRepr 
-     * allowing to get different representations of the URL 
-     * 
-     * (The UrlRepr instance is built on demand)
-    */
-    get as(): UrlRepr {
-        if (!this.#as) this.#as = new UrlRepr(this)
-        return this.#as
     }
 
     setRestrictions(restrictions?: Partial<XUrl.UrlRestrictions_T>) {
