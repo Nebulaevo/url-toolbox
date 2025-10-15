@@ -9,6 +9,7 @@ import {
 } from "../helpers/restrictions.js"
 
 import _ExtendedUrlMixin from "./extended-url-mixin.js"
+import RelativeUrl from "./relative-url.js"
 
 /** Class extending URL to add optionnal restrictions and representation utils */
 class XUrl extends _ExtendedUrlMixin {
@@ -29,6 +30,10 @@ class XUrl extends _ExtendedUrlMixin {
     }
 
     constructor(url: string|URL, base?: string|URL, restrictions?: Partial<XUrl.UrlRestrictions_T>) {
+        // RelativeUrl instances block access to the base url, which 
+        // might break things, so we convert them to a string before using them
+        if (url instanceof RelativeUrl) url = url.toString()
+
         super(url, base)
         this.#restrictions = this.#buildRestrictionsObject(restrictions)
         

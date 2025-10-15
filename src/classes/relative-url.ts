@@ -27,6 +27,10 @@ class RelativeUrl extends _ExtendedUrlMixin {
     }
 
     constructor(url?: string|URL) {
+        // RelativeUrl instances block access to the base url, which 
+        // might break things, so we convert them to a string before using them
+        if (url instanceof RelativeUrl) url = url.toString()
+
         super(url ?? '/', RelativeUrl.#DUMMY_ORIGIN)
         this.#instanceSetUp()
     }
