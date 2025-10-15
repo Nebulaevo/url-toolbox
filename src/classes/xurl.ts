@@ -25,55 +25,36 @@ class XUrl extends _ExtendedUrlBase {
 
     constructor(url: string|URL, base?: string|URL, restrictions?: Partial<XUrl.UrlRestrictions_T>) {
         super(url, base)
-        this.#restrictions = {
-            allowedProtocols: undefined,
-            allowedHosts: undefined,
-            allowCredentials: true,
-        }
-
-        // will throw a BrokenUrlRestrictionError 
-        // if restrictions on protocol or host are not respected
-        this.setRestrictions(restrictions)
+        this.#restrictions = this.#buildRestrictionsObject(restrictions)
+        
+        // Will throw an error if restrictions checks fail
+        checkProtocol(this, this.#restrictions.allowedProtocols)
+        checkHost(this, this.#restrictions.allowedHosts)
+        
+        // Forces values of credentials if not allowed
+        applyCredentialsRestriction({
+            url: this,
+            allowCredentials: this.#restrictions.allowCredentials
+        })
     }
 
-    setRestrictions(restrictions?: Partial<XUrl.UrlRestrictions_T>) {
+    #buildRestrictionsObject(restrictions?: Partial<XUrl.UrlRestrictions_T>): XUrl.UrlRestrictions_T {
         const {
             allowedProtocols,
             allowedHosts,
             allowCredentials
         } = restrictions ?? {}
 
-        this.#restrictions.allowedProtocols = isArray(allowedProtocols, {itemType: 'string'})
-            ? allowedProtocols : undefined
+        return {
+            allowedProtocols: isArray(allowedProtocols, {nonEmpty: true, itemType: 'string'}) 
+                ? allowedProtocols : undefined,
 
-        this.#restrictions.allowedHosts = isArray(allowedHosts, {itemType: 'string'})
-            ? allowedHosts : undefined
+            allowedHosts: isArray(allowedHosts, {nonEmpty: true, itemType: 'string'}) 
+                ? allowedHosts : undefined,
             
-        this.#restrictions.allowCredentials = isBool(allowCredentials)
-            ? allowCredentials
-            : true
-
-        try {
-            checkProtocol(this, this.#restrictions.allowedProtocols)
-            checkHost(this, this.#restrictions.allowedHosts)
-        } catch (err) {
-            // Either a BrokenUrlRestrictionError was thrown,
-            // or if the checks have failed the verification might have not run
-            // in any case, probably faulty state, should be removed
-
-            // If a restriction was broken in the protocol or host, 
-            // we reset the url to 'about:blank'
-            super.href = 'about:blank'
-
-            // re-throwning error as the url is now blank
-            throw err
+            allowCredentials: isBool(allowCredentials) 
+                ? allowCredentials : true,
         }
-
-        // Forces values of credentials if not allowed
-        applyCredentialsRestriction({
-            url: this,
-            allowCredentials: this.#restrictions.allowCredentials
-        })
     }
 
     #restrictedSetter(kwargs: XUrl.RestrictedSetterKwargs_T) {
