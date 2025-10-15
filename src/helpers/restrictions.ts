@@ -41,17 +41,17 @@ function checkHost(url: URL, whitelist?:string[]) {
 }
 
 /** if credentials are not allowed, we force their value to an empty string */
-function applyCredentialsRestriction ({url, allowCredentials}: applyCredentialsRestriction.Kwargs_T) {
-    if (allowCredentials) return
-
-    url.username = ''
-    url.password = ''
+function applyCredentialsRestriction ({url, ignoreCredentials}: applyCredentialsRestriction.Kwargs_T) {
+    if (ignoreCredentials) {
+        url.username = ''
+        url.password = ''
+    }    
 }
 
 namespace applyCredentialsRestriction {
     export type Kwargs_T = {
         url: URL, 
-        allowCredentials: boolean
+        ignoreCredentials: boolean
     }
 }
 

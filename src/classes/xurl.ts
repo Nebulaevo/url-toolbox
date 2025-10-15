@@ -39,7 +39,7 @@ class XUrl extends _ExtendedUrlMixin {
         // Forces values of credentials if not allowed
         applyCredentialsRestriction({
             url: this,
-            allowCredentials: this.#restrictions.allowCredentials
+            ignoreCredentials: this.#restrictions.ignoreCredentials
         })
     }
 
@@ -47,7 +47,7 @@ class XUrl extends _ExtendedUrlMixin {
         const {
             allowedProtocols,
             allowedHosts,
-            allowCredentials
+            ignoreCredentials
         } = restrictions ?? {}
 
         return {
@@ -57,8 +57,8 @@ class XUrl extends _ExtendedUrlMixin {
             allowedHosts: isArray(allowedHosts, {nonEmpty: true, itemType: 'string'}) 
                 ? allowedHosts : undefined,
             
-            allowCredentials: isBool(allowCredentials) 
-                ? allowCredentials : true,
+            ignoreCredentials: isBool(ignoreCredentials) 
+                ? ignoreCredentials : false,
         }
     }
 
@@ -93,7 +93,7 @@ class XUrl extends _ExtendedUrlMixin {
             // Forces values of credentials if not allowed
             applyCredentialsRestriction({
                 url: this,
-                allowCredentials: this.#restrictions.allowCredentials
+                ignoreCredentials: this.#restrictions.ignoreCredentials
             })
         }
 
@@ -114,16 +114,12 @@ class XUrl extends _ExtendedUrlMixin {
     }
 
     set username(value: string) {
-        const { allowCredentials } = this.#restrictions
-        if (!allowCredentials) return
-
+        if (this.#restrictions.ignoreCredentials) return
         super.username = value
     }
 
     set password(value: string) {
-        const { allowCredentials } = this.#restrictions
-        if (!allowCredentials) return
-
+        if (this.#restrictions.ignoreCredentials) return
         super.password = value
     }
 
@@ -171,7 +167,7 @@ namespace XUrl {
     export type UrlRestrictions_T = {
         allowedProtocols: string[] | undefined,
         allowedHosts: string[] | undefined,
-        allowCredentials: boolean
+        ignoreCredentials: boolean
     }
 
     export type RestrictedSetterKwargs_T = {
