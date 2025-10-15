@@ -1,5 +1,5 @@
 import { isArray } from "sniffly"
-import { BrokenUrlRestrictionError } from "../errors.js"
+import { BrokenUrlRestrictionError } from "../classes/errors.js"
 
 const DEFAULT_PROTOCOL_WHITELIST = new Set([
     'http:', 'https:', 

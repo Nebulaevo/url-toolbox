@@ -1,4 +1,4 @@
-import { canParsePolyfill } from "./utils/can-parse.js"
+import { canParsePolyfill } from "../helpers/can-parse.js"
 
 import _ExtendedUrlBase from "./base-url.js"
 

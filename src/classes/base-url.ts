@@ -1,6 +1,6 @@
 import { isArray } from "sniffly"
 
-import { buildPathnameFromArray } from "./utils/pathname.js"
+import { buildPathnameFromArray } from "../helpers/pathname.js"
 import UrlRepr from "./url-repr.js"
 
 

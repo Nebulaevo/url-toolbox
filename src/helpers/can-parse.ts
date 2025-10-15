@@ -1,4 +1,4 @@
-import XUrl from "../xurl.js"
+import XUrl from "../classes/xurl.js"
 
 
 function canParsePolyfill(url: string|URL, base?: string|URL) {

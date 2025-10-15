@@ -1,7 +1,7 @@
 import { isArray, isBool } from "sniffly"
 
-import { checkProtocol, checkHost, checkCredentials } from "./utils/restrictions.js"
-import { canParseXUrl } from "./utils/can-parse.js"
+import { checkProtocol, checkHost, checkCredentials } from "../helpers/restrictions.js"
+import { canParseXUrl } from "../helpers/can-parse.js"
 
 import _ExtendedUrlBase from "./base-url.js"
 
