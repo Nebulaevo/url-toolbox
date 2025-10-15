@@ -236,7 +236,7 @@ Key/value object used for `filtered()` and `normalised()` methods, allowing to f
 
 | Key | Description | Default |
 | --- | ----------- | ------- |
-| `baseMode` | string, can be : <br><li><ul>"ALL" includes protocol, credentials and host in the result</ul><ul>"NO_PROTOCOL" : includes only credentials and host in the result</ul><ul>"NO_CREDENTIALS" : includes only protocol and host in the result</ul><ul>"HOST_ONLY" : includes only host in the result</ul><ul>"NO_BASE" : returns an empty string as base</ul></li> | "NO_CREDENTIALS" |
+| `baseMode` | string, can be : <br><ul><li>"ALL" : includes protocol, credentials and host in the result</li><li>"NO_PROTOCOL" : includes only credentials and host in the result</li><li>"NO_CREDENTIALS" : includes only protocol and host in the result</li><li>"HOST_ONLY" : includes only host in the result</li><li>"NO_BASE" : returns an empty string as base</li></ul> | "NO_CREDENTIALS" |
 | `pathname` |  |  |
 | `search` |  |  |
 | `hash` |  |  |
