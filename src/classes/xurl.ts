@@ -1,6 +1,6 @@
 import { isArray, isBool } from "sniffly"
 
-import { checkProtocol, checkHost, checkCredentials } from "../helpers/restrictions.js"
+import { checkProtocol, checkHost, applyCredentialsRestriction } from "../helpers/restrictions.js"
 import { canParseXUrl } from "../helpers/can-parse.js"
 
 import _ExtendedUrlBase from "./base-url.js"
@@ -54,8 +54,8 @@ class XUrl extends _ExtendedUrlBase {
             : true
 
         try {
-            checkProtocol(this.protocol, this.#restrictions.allowedProtocols)
-            checkHost(this.host, this.#restrictions.allowedHosts)
+            checkProtocol(this, this.#restrictions.allowedProtocols)
+            checkHost(this, this.#restrictions.allowedHosts)
         } catch (err) {
             // Either a BrokenUrlRestrictionError was thrown,
             // or if the checks have failed the verification might have not run
@@ -69,25 +69,11 @@ class XUrl extends _ExtendedUrlBase {
             throw err
         }
 
-        try {
-            checkCredentials({
-                username: this.username, 
-                passord: this.password, 
-                allowCredentials: this.#restrictions.allowCredentials
-            })
-        } catch (err) {
-            // Either a BrokenUrlRestrictionError was thrown,
-            // or if the checks have failed the verification might have not run
-            // in any case, probably faulty state, should be removed
-
-            // If a credentials restriction was broken, 
-            // we reset the credentials
-            super.password = ''
-            super.username = ''
-
-            // error should probably not be re-thrown, 
-            // restriction has been applied as expected
-        }
+        // Forces values of credentials if not allowed
+        applyCredentialsRestriction({
+            url: this,
+            allowCredentials: this.#restrictions.allowCredentials
+        })
     }
 
     #restrictedSetter(kwargs: XUrl.RestrictedSetterKwargs_T) {
@@ -108,18 +94,19 @@ class XUrl extends _ExtendedUrlBase {
         }
     }
 
-    set href(value:string) {
+    set href(value: string) {
 
         // Remark : 
         // we use arrow function so that the value of "super" and "this"
         // is always taken from their parent context (the method they are executed in)
         const setter = () => super.href = value
         const checks = () => {
-            checkProtocol(this.protocol, this.#restrictions.allowedProtocols)
-            checkHost(this.host, this.#restrictions.allowedHosts)
-            checkCredentials({
-                username: this.username, 
-                passord: this.password, 
+            checkProtocol(this, this.#restrictions.allowedProtocols)
+            checkHost(this, this.#restrictions.allowedHosts)
+
+            // Forces values of credentials if not allowed
+            applyCredentialsRestriction({
+                url: this,
                 allowCredentials: this.#restrictions.allowCredentials
             })
         }
@@ -127,87 +114,67 @@ class XUrl extends _ExtendedUrlBase {
         this.#restrictedSetter({setter, checks})
     }
 
-    set protocol(value:string) {
+    set protocol(value: string) {
 
         // Remark : 
         // we use arrow function so that the value of "super" and "this"
         // is always taken from their parent context (the method they are executed in)
         const setter = () => super.protocol = value
         const checks = () => {
-            checkProtocol(this.protocol, this.#restrictions.allowedProtocols)
+            checkProtocol(this, this.#restrictions.allowedProtocols)
         }
         
         this.#restrictedSetter({setter, checks})
     }
 
-    set username(value:string) {
+    set username(value: string) {
+        const { allowCredentials } = this.#restrictions
+        if (!allowCredentials) return
 
-        // Remark : 
-        // we use arrow function so that the value of "super" and "this"
-        // is always taken from their parent context (the method they are executed in)
-        const setter = () => super.username = value
-        const checks = () => {
-            checkCredentials({
-                username: this.username, 
-                passord: this.password, 
-                allowCredentials: this.#restrictions.allowCredentials
-            })
-        }
-        
-        this.#restrictedSetter({setter, checks})
+        super.username = value
     }
 
-    set password(value:string) {
+    set password(value: string) {
+        const { allowCredentials } = this.#restrictions
+        if (!allowCredentials) return
 
-        // Remark : 
-        // we use arrow function so that the value of "super" and "this"
-        // is always taken from their parent context (the method they are executed in)
-        const setter = () => super.password = value
-        const checks = () => {
-            checkCredentials({
-                username: this.username, 
-                passord: this.password, 
-                allowCredentials: this.#restrictions.allowCredentials
-            })
-        }
-        
-        this.#restrictedSetter({setter, checks})
+        super.password = value
     }
 
-    set hostname(value:string) {
+    set hostname(value: string) {
 
         // Remark : 
         // we use arrow function so that the value of "super" and "this"
         // is always taken from their parent context (the method they are executed in)
         const setter = () => super.hostname = value
         const checks = () => {
-            checkHost(this.host, this.#restrictions.allowedHosts)
+            checkHost(this, this.#restrictions.allowedHosts)
         }
         
         this.#restrictedSetter({setter, checks})
     }
 
-    set host(value:string) {
+    set host(value: string) {
 
         // Remark : 
         // we use arrow function so that the value of "super" and "this"
         // is always taken from their parent context (the method they are executed in)
         const setter = () => super.host = value
         const checks = () => {
-            checkHost(this.host, this.#restrictions.allowedHosts)
+            checkHost(this, this.#restrictions.allowedHosts)
         }
         
         this.#restrictedSetter({setter, checks})
     }
 
-    set port(value:string) {
+    set port(value: string) {
 
         // Remark : 
         // we use arrow function so that the value of "super" and "this"
         // is always taken from their parent context (the method they are executed in)
         const setter = () => super.port = value
         const checks = () => {
-            checkHost(this.host, this.#restrictions.allowedHosts)
+            checkHost(this, this.#restrictions.allowedHosts)
         }
         
         this.#restrictedSetter({setter, checks})

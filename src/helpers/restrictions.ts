@@ -9,45 +9,44 @@ const DEFAULT_PROTOCOL_WHITELIST = new Set([
     'mailto:', 'tel:', 'sms:',
 ])
 
-function checkProtocol(protocol: string, whitelist?: string[]) {
+function checkProtocol(url: URL, whitelist?: string[]) {
     const isAllowed = isArray(whitelist, {nonEmpty: true})
-        ? whitelist.includes(protocol)
-        : DEFAULT_PROTOCOL_WHITELIST.has(protocol)
+        ? whitelist.includes(url.protocol)
+        : DEFAULT_PROTOCOL_WHITELIST.has(url.protocol)
 
     if (!isAllowed) throw new BrokenUrlRestrictionError(
-        `protocol : "${protocol}" is not in the whitelist`
+        `protocol : "${url.protocol}" is not in the whitelist`
     )
 }
 
 
-function checkHost(host: string, whitelist?:string[]) {
+function checkHost(url: URL, whitelist?:string[]) {
     const isAllowed = isArray(whitelist, {nonEmpty: true})
-        ? whitelist.includes(host)
+        ? whitelist.includes(url.host)
         : true
 
     if (!isAllowed) throw new BrokenUrlRestrictionError(
-        `host : "${host}" is not in the whitelist`
+        `host : "${url.host}" is not in the whitelist`
     )
 }
 
-function checkCredentials(kwargs: checkCredentials.Kwargs_T ) {
+/** if credentials are not allowed, we force their value to an empty string */
+function applyCredentialsRestriction ({url, allowCredentials}: applyCredentialsRestriction.Kwargs_T) {
+    if (allowCredentials) return
 
-    const isAllowed = kwargs.allowCredentials
-        ? true
-        : (kwargs.username === '') && (kwargs.passord === '')
-
-    if (!isAllowed) throw new BrokenUrlRestrictionError(
-        `use of credentials is forbiden on this instance`
-    )
+    url.username = ''
+    url.password = ''
 }
 
-namespace checkCredentials {
-    export type Kwargs_T = {username: string, passord: string, allowCredentials: boolean}
+namespace applyCredentialsRestriction {
+    export type Kwargs_T = {
+        url: URL, 
+        allowCredentials: boolean
+    }
 }
-
 
 export {
     checkProtocol,
     checkHost,
-    checkCredentials,
+    applyCredentialsRestriction,
 }
