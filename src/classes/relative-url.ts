@@ -1,12 +1,12 @@
 import { canParsePolyfill } from "../helpers/can-parse.js"
 
-import _ExtendedUrlBase from "./base-url.js"
+import _ExtendedUrlMixin from "./extended-url-mixin.js"
 
 /** Class extending URL to generate base-less http urls 
  * 
  * ℹ️ This class overrides / prevents access to the url base values.
 */
-class RelativeUrl extends _ExtendedUrlBase {
+class RelativeUrl extends _ExtendedUrlMixin {
 
     static #DUMMY_PROTOCOL = 'http:'
     static #DUMMY_HOST = 'relative-url.NotATld'

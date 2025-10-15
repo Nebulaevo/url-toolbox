@@ -3,10 +3,10 @@ import { isArray, isBool } from "sniffly"
 import { checkProtocol, checkHost, applyCredentialsRestriction } from "../helpers/restrictions.js"
 import { canParseXUrl } from "../helpers/can-parse.js"
 
-import _ExtendedUrlBase from "./base-url.js"
+import _ExtendedUrlMixin from "./extended-url-mixin.js"
 
 /** Class extending URL to add optionnal restrictions and representation utils */
-class XUrl extends _ExtendedUrlBase {
+class XUrl extends _ExtendedUrlMixin {
     #restrictions: XUrl.UrlRestrictions_T 
 
     /** Static method returning a new `XUrl` instance created from the given parameters, or `null` if parsing or restrictions failed */

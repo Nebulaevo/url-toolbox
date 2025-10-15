@@ -5,7 +5,7 @@ import UrlRepr from "./url-repr.js"
 
 
 /** Base class  for extended URL classes */
-class _ExtendedUrlBase extends URL {
+class _ExtendedUrlMixin extends URL {
     #as?: UrlRepr
     
     /** Shortcut method allowing to set pathname from an array of strings 
@@ -33,4 +33,4 @@ class _ExtendedUrlBase extends URL {
     }
 }
 
-export default _ExtendedUrlBase
+export default _ExtendedUrlMixin
