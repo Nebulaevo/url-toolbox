@@ -9,6 +9,16 @@ const DEFAULT_PROTOCOL_WHITELIST = new Set([
     'mailto:', 'tel:', 'sms:',
 ])
 
+function toProtocolArray(protocolList: string[]) {
+    return protocolList.map(item => {
+        let protocol = item.trim()
+        if (protocol.endsWith(':')) {
+            protocol += ':'
+        }
+        return protocol
+    })
+}
+
 function checkProtocol(url: URL, whitelist?: string[]) {
     const isAllowed = isArray(whitelist, {nonEmpty: true})
         ? whitelist.includes(url.protocol)
@@ -46,6 +56,7 @@ namespace applyCredentialsRestriction {
 }
 
 export {
+    toProtocolArray,
     checkProtocol,
     checkHost,
     applyCredentialsRestriction,

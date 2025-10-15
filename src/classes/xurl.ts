@@ -1,7 +1,12 @@
 import { isArray, isBool } from "sniffly"
 
-import { checkProtocol, checkHost, applyCredentialsRestriction } from "../helpers/restrictions.js"
 import { canParseXUrl } from "../helpers/can-parse.js"
+import { 
+    checkProtocol, 
+    checkHost, 
+    applyCredentialsRestriction, 
+    toProtocolArray 
+} from "../helpers/restrictions.js"
 
 import _ExtendedUrlMixin from "./extended-url-mixin.js"
 
@@ -47,7 +52,7 @@ class XUrl extends _ExtendedUrlMixin {
 
         return {
             allowedProtocols: isArray(allowedProtocols, {nonEmpty: true, itemType: 'string'}) 
-                ? allowedProtocols : undefined,
+                ? toProtocolArray(allowedProtocols) : undefined,
 
             allowedHosts: isArray(allowedHosts, {nonEmpty: true, itemType: 'string'}) 
                 ? allowedHosts : undefined,
