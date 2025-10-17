@@ -1,7 +1,7 @@
 # 📬 URL Toolbox
-**A tiny, powerful layer on top of the `URL` standard**
+**The `URL` class, upgraded.**
 
-Collection of classes to extend or complete the `URL` class.
+Provides a collection of classes to extend or complete the `URL` class.
 
 ## Table of Contents
 
