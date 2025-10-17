@@ -7,7 +7,7 @@ function buildPathnameFromArray(pathSegments: string[]) {
         const encodedSegments = pathSegments.map(
             segment => encodeURIComponent(segment)
         )
-        return `/${encodedSegments}/`
+        return `/${encodedSegments.join('/')}/`
     }
 }
 
