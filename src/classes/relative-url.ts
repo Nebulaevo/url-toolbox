@@ -1,15 +1,18 @@
+import { canParsePolyfill } from "../helpers/can-parse.js"
 
-import tools from '../purification/tools.js'
-import { assembleUrlParts } from '../utils/url-parts.js'
+import _ExtendedUrlMixin from "./extended-url-mixin.js"
 
-import AbsoluteURL from "./absolute-url.js"
+/** Class extending URL to generate base-less http urls 
+ * 
+ * ℹ️ This class overrides / prevents access to the url base values.
+*/
+class RelativeUrl extends _ExtendedUrlMixin {
 
+    static #DUMMY_PROTOCOL = 'http:'
+    static #DUMMY_HOST = 'relative-url.NotATld'
+    static #DUMMY_ORIGIN = `${RelativeUrl.#DUMMY_PROTOCOL}//${RelativeUrl.#DUMMY_HOST}`
 
-class RelativeURL extends AbsoluteURL {
-
-    static BASE = 'http://relative-url.com'
-
-    static parse(url: string, _base?: undefined) {
+    static parse(url: string|URL) {
         try {
             return new this(url)
         } catch (err) {
@@ -17,51 +20,23 @@ class RelativeURL extends AbsoluteURL {
         }
     }
 
-    static canParse(url: string | URL) {
-        return URL.canParse(url, RelativeURL.BASE)
+    static canParse(url: string|URL) {
+        const canParse = typeof URL.canParse === 'function'
+            ? URL.canParse : canParsePolyfill
+        return canParse(url, RelativeUrl.#DUMMY_ORIGIN)
     }
 
-    static fromParts(kwargs: {
-        urlParts: RelativeURL.UrlParts_T, 
-        purifyOpts?: RelativeURL.PurifyOptions_T
-    }): RelativeURL | null {
-        
-        const purify = kwargs.purifyOpts?.purify ?? false
-        let { urlParts } = kwargs
+    constructor(url?: string|URL) {
+        // RelativeUrl instances block access to the base url, which 
+        // might break things, so we convert them to a string before using them
+        if (url instanceof RelativeUrl) url = url.toString()
 
-        if (purify) {
-            const purifiedRelativePieces = tools.purifyTailParts({
-                pathname: urlParts.pathname,
-                search: urlParts.search,
-                hash: urlParts.hash,
-            })
-            if (!purifiedRelativePieces) return null
-            
-            urlParts = purifiedRelativePieces
-        }
-
-        const path = assembleUrlParts(urlParts)
-        
-        try {
-            const url = new this(path)
-            return url
-        } catch (_err) {
-            return null
-        }
+        super(url ?? '/', RelativeUrl.#DUMMY_ORIGIN)
+        this.#instanceSetUp()
     }
 
-    constructor(url: string | URL) {
-        super(url, RelativeURL.BASE)
-        
-        this.#redefineNonRelativeProperties()
-    }
-
-    #redefineNonRelativeProperties() {
-        // Overriting
-        this.host = RelativeURL.BASE
-        this.password = ''
-        this.port = ''
-        this.username = ''
+    #instanceSetUp() {
+        this.#forceDummyBase()
 
         // Redefining ignored properties
         const ignoredValueDescriptor = {
@@ -77,34 +52,40 @@ class RelativeURL extends AbsoluteURL {
         Object.defineProperty(this, 'password', ignoredValueDescriptor)
         Object.defineProperty(this, 'host', ignoredValueDescriptor)
         Object.defineProperty(this, 'hostname', ignoredValueDescriptor)
-        Object.defineProperty(this, 'origin', ignoredValueDescriptor)
     }
 
-    /** Overriden: returning relative url */
-    get href(): string {
+    #forceDummyBase() {
+        super.protocol = RelativeUrl.#DUMMY_PROTOCOL
+        super.host = RelativeUrl.#DUMMY_HOST
+        super.port = ''
+        super.username = ''
+        super.password = ''
+    }
+
+    get origin() {
+        // empty value for 'origin' should be a 'null' string
+        return 'null'
+    }
+
+    get href() {
         return `${this.pathname}${this.search}${this.hash}`
     }
 
-    /** Overriden: returning relative url */
+    set href(value: string) {
+        const parsedUrl = new URL(value, RelativeUrl.#DUMMY_ORIGIN)
+
+        this.pathname = parsedUrl.pathname
+        this.search = parsedUrl.search
+        this.hash = parsedUrl.hash
+    }
+
     toJSON(): string {
         return this.href
     }
 
-    /** Overriden: returning relative url */
     toString(): string {
         return this.href
     }
 }
 
-namespace RelativeURL {
-    export type PurifyOptions_T = {
-        purify: boolean
-    }
-
-    export type UrlParts_T = Pick<
-        AbsoluteURL.UrlParts_T, 
-        'pathname' | 'search' | 'hash'
-    >
-}
-
-export default RelativeURL
+export default RelativeUrl

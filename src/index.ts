@@ -1,27 +1,15 @@
-import AbsoluteURL from "./classes/absolute-url.js"
-import RelativeURL from "./classes/relative-url.js"
-
-import URLInstancePurifier from './classes/url-instance-purifier.js'
+import XUrl from "./classes/xurl.js"
+import RelativeUrl from "./classes/relative-url.js"
 import UrlRepr from "./classes/url-repr.js"
+import { BrokenUrlRestrictionError } from "./classes/errors.js"
 
-import urlPurifyTools from './purification/tools.js'
-
-import { assemblePathnameSections, assembleUrlParts } from "./utils/url-parts.js"
-
-
-type EnhancedURL_T = AbsoluteURL | RelativeURL
+type ExtendedUrl_T = XUrl | RelativeUrl
 
 export {
-    AbsoluteURL,
-    RelativeURL,
-    
-    URLInstancePurifier,
+    XUrl,
+    RelativeUrl,
     UrlRepr,
-    
-    urlPurifyTools,
-    
-    assembleUrlParts,
-    assemblePathnameSections
+    BrokenUrlRestrictionError,
 }
 
-export type { EnhancedURL_T }
+export type { ExtendedUrl_T }
