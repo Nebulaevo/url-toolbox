@@ -2,36 +2,30 @@
 
 Collection of classes to extend or complete the `URL` class.
 
-
-| Class            | Description |
-| ---------------- | ----------- |
-| `XUrl` | Extends the `URL` class with representation utils, setter shortcuts, and the abililty to limit the allowed protocols and hosts, or to ignore credentials |
-| `RelativeUrl` | Class derived from `URL` to handle relative http url. It doesn't have a base, the only accessible url parts are `pathname`, `search`, `searchParams`, and `hash` |
-| `UrlRepr` | Defines representation methods for a `URL` instance (filter parts or normalise url parts) |
-
 ## Table of Contents
 
 - [URL subclass : `XUrl`](#url-subclass--xurl)
 - [URL subclass : `RelativeUrl`](#url-subclass--relativeurl)
-- [`XUrl` & `RelativeUrl` common utils](#xurl--relativeurl--common-utils)
-- [Representation heler class `UrlRepr`](#representation-helper-class--urlrepr)
+- [`XUrl` & `RelativeUrl` : common utils](#xurl--relativeurl--common-utils)
+- [Representation helper class : `UrlRepr`](#representation-helper-class--urlrepr)
+- [Additional types](#types)
 
 ## URL subclass : `XUrl`
 
-Extends the `URL` class with representation utils, setter shortcuts, and the abililty to limit the allowed protocols and hosts, or to ignore credentials
+Class extending `URL` with representation utils, setter shortcuts, and the abililty to limit the allowed protocols and hosts, or to ignore credentials.
 
-ℹ️ Common utils between `XUrl` & `RelativeUrl` (setter shortcuts an representation utils) are detailed here : [`XUrl` & `RelativeUrl` common utils](#xurl--relativeurl--common-utils)
+ℹ️ Setter shortcuts an representation utils are common between `XUrl` & `RelativeUrl` and are detailed here : [`XUrl` & `RelativeUrl` common utils](#xurl--relativeurl--common-utils)
 
 ### Restrictions
 
 Restrictions are declared as a key/value object.\
-They are defined at instance creation, by default it just sets allowed protocols, but it can also limit the allowed hosts, or prevent use of credentials in the URL.
+They are defined at instance creation, if no value is given for a key, the default value is used.
 
 | Key | Description | Default |
 | - | - | - |
-| `allowedProtocols` | Optionnal string array defining whitelisted protocols. Trying to set a non allowed protocol will throw a `BrokenUrlRestrictionError` (it's not possible to allow all protocols, if no allowed protocols are listed the default list is used) | http:, https:, ftp:, sftp:, ws:, wss:, blob:, about:, mailto:, tel:, sms: |
-| `allowedHosts` | Optionnal string array defining whitelisted hosts (should include eventual subdomain, and eventual port number, if applicable). Trying to set a non allowed host will throw a `BrokenUrlRestrictionError` | Not restricted |
-| `ignoreCredentials` | Optionnal boolean, if true, username and password values are erased and cannot be modified. Will just ignore credentials, does not raise any error. | Do not ignore |
+| `allowedProtocols` | *String array (optionnal)*<br>Defines whitelisted protocols.<br>(it's not possible to allow all protocols, if no allowed protocols are listed the default list is used)<br><br>Any attempt to use a non allowed protocol will throw a `BrokenUrlRestrictionError` | http:, https:, ftp:, sftp:, ws:, wss:, blob:, about:, mailto:, tel:, sms: |
+| `allowedHosts` | *String array (optionnal)*<br>Defines whitelisted hosts.<br>(should include eventual subdomain, and eventual port number, if applicable)<br><br>If defined and non empty, any attempt to use a non allowed host will throw a `BrokenUrlRestrictionError` | Not restricted |
+| `ignoreCredentials` | *Boolean (optionnal)*<br><br>If true, username and password values are erased and cannot be modified. Any attempt to set credentials anyway will be ignored but will not throw any error. | Allow credentials |
 
 
 #### `BrokenUrlRestrictionError`
@@ -69,7 +63,7 @@ urlA.href = 'http://wrong-domain.com/path' // -> throws an error (wrong host)
 urlA.protocol = 'ftp:' // -> throws an error (wrong protocol)
 ```
 
-If given url doesn't respect protocol or host restrictions at intance creation, operation will fail with `BrokenUrlRestrictionError`
+If given url doesn't respect protocol or host restrictions at intance creation, operation will also fail with `BrokenUrlRestrictionError`
 
 ```js
 const restrictions = {
@@ -84,7 +78,7 @@ const urlA = new XUrl(
 ) // -> throws an error (wrong protocol & host)
 
 const urlB = new XUrl('javascript:alert("XSS")') 
-// -> throws an error (javascript: is not in the default list of allowed protocols)
+// -> throws an error (javascript: is not in the default list of allowed protocols and '' is not an allowed host)
 
 ```
 
@@ -113,7 +107,7 @@ url.toString() // -> 'https://domain.com//test/path/'
 import { XUrl } from 'url-toolbox'
 
 const restrictions = {
-    allowedProtocols: [ 'https', ],
+    allowedProtocols: [ 'http', 'https' ],
     allowedHosts: [ 'domain.com', ]
 }
 
@@ -121,17 +115,17 @@ XUrl.canParse('https://domain.com/test/path/', undefined, restrictions) // -> tr
 
 XUrl.canParse('/test/path/', 'https://wrong-domain.com', restrictions) // -> false (wrong host)
 
-XUrl.canParse('javascript:alert("XSS")') // -> false (javascript: is not in the default list of allowed protocols)
+XUrl.canParse('javascript:alert("XSS")') // -> false (javascript: is not in the default list of allowed protocols and '' is not an allowed host) 
 ```
 
 
 ## URL subclass : `RelativeUrl`
 
-Class derived from `URL` to handle relative http url.
+Class extending `URL` to handle relative http url (includes the same representation utils and setter shortcuts as `XUrl`).
 
 An instance of `RelativeUrl` will always ignore all values from the url base (protcol, username, password, host, hostname, port).
 
-ℹ️ Common utils between `XUrl` & `RelativeUrl` (setter shortcuts an representation utils) are detailed here : [`XUrl` & `RelativeUrl` common utils](#xurl--relativeurl--common-utils)
+ℹ️ Setter shortcuts an representation utils are common between `XUrl` & `RelativeUrl` and are detailed here : [`XUrl` & `RelativeUrl` common utils](#xurl--relativeurl--common-utils)
 
 ### Instance Creation
 
@@ -141,22 +135,24 @@ Instances can be created with `new` or `RelativeUrl.parse`
 import { RelativeUrl } from 'url-toolbox'
 
 const urlA = new RelativeUrl('/my/path/?query=banana')
-const urlB = RelativeUrl.parse('https://domain.com/my/path/?query=banana')
+const urlB = RelativeUrl.parse('/my/path/?query=banana')
+const urlC = RelativeUrl.parse('https://domain.com/my/path/?query=banana')
 
 urlA.toString() // -> /my/path/?query=banana
 urlB.toString() // -> /my/path/?query=banana
+urlC.toString() // -> /my/path/?query=banana
 
 urlA.href = '/articles/'
 urlA.toString() // -> /articles/
 
-// url base will be ignored
-urlA.href = 'https://domain.com/my/path/?query=banana'
-urlA.toString() // -> /my/path/?query=banana
+// url base will always be ignored
+urlB.href = 'https://domain.com/my/path/?query=banana'
+urlB.toString() // -> /my/path/?query=banana
 ```
 
 ### `RelativeUrl.canParse`
 
-Allows relative urls
+`canParse` static method is modified to allow relative urls
 
 ```js
 import { RelativeUrl } from 'url-toolbox'
@@ -174,7 +170,7 @@ Each `XUrl` and `RelativeUrl` instance have an `as` key, that encapsulates repre
 
 Under the hood, `as` returns a `UrlRepr` instance, that defines the representation methods linked to the current url instance.
 
-see [`UrlRepr doc`](#representation-helper-class--urlrepr)
+See [`UrlRepr documentation`](#representation-helper-class--urlrepr)
 
 ```js
 import { XUrl, RelativeUrl } from 'url-toolbox'
@@ -216,11 +212,11 @@ url.toString() // -> https://site.com/articles/best%20tomato%2Fpasta/
 
 Class defining representation utils for a URL instance
 
-ℹ️ Setup automatically in `XUrl` and `RelativeUrl` instances under the `as` attribute.
+ℹ️ For `XUrl` and `RelativeUrl` instances, an instance of `UrlRepr` is accessible under the `as` attribute.
 
 ### Creating an instance
 
-The instance needs to be linked with a URL instance
+A `UrlRepr` instance needs to be linked with a `URL` instance
 
 ```js
 import { UrlRepr } from 'url-toolbox'
@@ -230,93 +226,11 @@ const url = new URL('http://my-domain.com/path?query1=value1&query2=value2')
 const urlRepr = new UrlRepr(url)
 ```
 
-### Filtering Options
-
-Key/value object used for `filtered()` and `normalised()` methods, allowing to filter the url parts included in a URL, all keys are optional with default values.
-
-| Key | Description | Default |
-| --- | ----------- | ------- |
-| `baseMode` | string, can be : <br><ul><li>"ALL" : includes protocol, credentials and host in the result</li><li>"NO_PROTOCOL" : includes only credentials and host in the result</li><li>"NO_CREDENTIALS" : includes only protocol and host in the result</li><li>"HOST_ONLY" : includes only host in the result</li><li>"NO_BASE" : returns an empty string as base</li></ul> | "NO_CREDENTIALS" |
-| `pathname` |  |  |
-| `search` |  |  |
-| `hash` |  |  |
-
-
-<li><ul>"ALL" includes protocol, credentials and host in the result</ul><ul>"NO_PROTOCOL" : includes only credentials and host in the result</ul><ul>"NO_CREDENTIALS" : includes only protocol and host in the result</ul><ul>"HOST_ONLY" : includes only host in the result</ul><ul>"NO_BASE" : returns an empty string as base</ul></li>
-
-- `baseMode` (`string`, default: `'NO_CREDENTIALS'`) modifies what's included in the url base :
-    - <ul>"ALL" includes protocol, credentials and host in the result</ul>
-    - <ul>"NO_PROTOCOL" : includes only credentials and host in the result</ul>
-    - <ul>"NO_CREDENTIALS" : includes only protocol and host in the result</ul>
-    - <ul>"HOST_ONLY" : includes only host in the result</ul>
-    - <ul>"NO_BASE" : returns an empty string as base</ul>
-
-- `pathname` (`boolean`, default: `true`) if true, we include the pathname in the result
-
-- `search` (`boolean`, default `true`) - if true, we include the search in the result
-
-- `hash` (`boolean`, default `true`) - if true, we include the hash in the result
-
-
-```js
-// requests only host and pathname
-const filteringOpts = {
-    baseMode: 'HOST_ONLY',
-    pathname: true,
-    search: false,
-    hash: false
-}
-```
-
-### Filtered Representation
-
-
-
-#### Attribute : `normalisedPathname` (Read only)
-
-
-#### Attribute : `normalisedSearch` (Read only)
-
-
-### Methods
-
-#### common argument structure : `filteringOpts`
-
-Key/value object used for `filtered()` and `normalised()` methods, allowing to filter the url parts included in a URL, all keys are optional with default values.
-
-- `baseMode` (`string`, default: `'NO_CREDENTIALS'`) modifies what's included in the url base :
-    - `'ALL'` includes protocol, credentials and host in the result
-    - `'NO_PROTOCOL'` : includes only credentials and host in the result
-    - `'NO_CREDENTIALS'` : includes only protocol and host in the result
-    - `'HOST_ONLY'` : includes only host in the result
-    - `'NO_BASE'` : returns an empty string as base
-
-- `pathname` (`boolean`, default: `true`) if true, we include the pathname in the result
-
-- `search` (`boolean`, default `true`) - if true, we include the search in the result
-
-- `hash` (`boolean`, default `true`) - if true, we include the hash in the result
-
-
-```js
-// requests only host and pathname
-const filteringOpts = {
-    baseMode: 'HOST_ONLY',
-    pathname: true,
-    search: false,
-    hash: false
-}
-```
-
-#### Method : `filtered( filteringOpts )`
-
-The `filtered` method allows to get a url representation with 
-
-
-####  Method : `normalised( filteringOpts? )`
+### Getting a Normalised Representation
 
 The `normalised` method allows to get a url representation that is easy to compare with another url. 
-The path and search params order is normalised to insure that most equivalent urls can be efficiently compared
+The path and search params order is normalised to insure that most equivalent urls can be efficiently compared.
+
 
 ```js
 import { UrlRepr } from 'url-toolbox'
@@ -331,25 +245,56 @@ const reprA = new UrlRepr(urlA)
 const reprB = new UrlRepr(urlB)
 
 
-urlA === urlB // false
+urlA.href === urlB.href // false
 reprA.normalised() === reprB.normalised() // true
 ```
 
-
-We can also filter the parts included in the normalised representation by providing a `filteringOpts` object.
-(see `filteringOpts` structure)
+There are also shortcut attributes allowing to get only the normalised path or normalised search :\
+`normalisedPathname` and `normalisedSearch`
 ```js
 import { UrlRepr } from 'url-toolbox'
 
-// defining equivalent urls having non matching hrefs
-const url = new URL('http://my-domain.com/path?query1=value1&query2=value2')
-
+const url = new URL('http://my-domain.com/path?query2=value2&query1=value1')
 const repr = new UrlRepr(url)
 
-repr.normalise() // -> 'http://my-domain.com/path/?query1=value1&query2=value2'
-repr.normalise({search:false}) // -> 'http://my-domain.com/path/'
+
+repr.normalisedPathname // -> /path/ (added slash)
+repr.normalisedSearch // -> ?query1=value1&query2=value2 (ordered keys)
 ```
 
+
+### Getting a Filtered Representation
+
+It's possible to filter the url parts in the representation by using the `filtered` method, or by providing filtering options to the `normalised` method.
+
+The filtering options argument is a key/value object allowing to filter the url parts included in a url representation (all keys are optional with default values).
+
+| Key | Description | Default |
+| --- | ----------- | ------- |
+| `baseMode` | *Literal string (optional)*<br>Modifies what's included in the url base : <br><ul><li>`"ALL"` : includes protocol, credentials and host in the result</li><li>`"NO_PROTOCOL"` : includes only credentials and host in the result</li><li>`"NO_CREDENTIALS"` : includes only protocol and host in the result</li><li>`"HOST_ONLY"` : includes only host in the result</li><li>`"NO_BASE"` : does not include any part of the url base</li></ul> | `"NO_CREDENTIALS"` |
+| `pathname` | *Boolean (optional)*<br>Indicates whether or not we should include the pathname in the result | included |
+| `search` | *Boolean (optional)*<br>Indicates whether or not we should include the search in the result | included |
+| `hash` | *Boolean (optional)*<br>Indicates whether or not we should include the hash in the result | included |
+
+
+
+```js
+import { UrlRepr } from 'url-toolbox'
+
+const url = new URL('http://my-domain.com/path?query2=value2&query1=value1#somewhere')
+const repr = new UrlRepr(url)
+
+
+repr.filtered({
+    baseMode: 'HOST_ONLY',
+    search: false
+}) // -> my-domain.com/path#somewhere
+
+repr.normalised({
+    baseMode: 'NO_BASE',
+    hash: false
+}) // -> /path/?query1=value1&query2=value2
+```
 
 ## Types
 
