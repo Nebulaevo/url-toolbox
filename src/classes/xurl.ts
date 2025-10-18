@@ -33,7 +33,7 @@ class XUrl extends _ExtendedUrlMixin {
         // RelativeUrl instances block access to the base url, which 
         // might break things, so we convert them to a string before using them
         if (url instanceof RelativeUrl) url = url.toString()
-
+        
         super(url, base)
         this.#restrictions = this.#buildRestrictionsObject(restrictions)
         
@@ -85,8 +85,11 @@ class XUrl extends _ExtendedUrlMixin {
         }
     }
 
-    set href(value: string) {
+    get href() {
+        return super.href
+    }
 
+    set href(value: string) {        
         // Remark : 
         // we use arrow function so that the value of "super" and "this"
         // is always taken from their parent context (the method they are executed in)
@@ -103,10 +106,14 @@ class XUrl extends _ExtendedUrlMixin {
         }
 
         this.#restrictedSetter({setter, checks})
+        
     }
 
+    get protocol() {
+        return super.protocol
+    }
+    
     set protocol(value: string) {
-
         // Remark : 
         // we use arrow function so that the value of "super" and "this"
         // is always taken from their parent context (the method they are executed in)
@@ -118,9 +125,17 @@ class XUrl extends _ExtendedUrlMixin {
         this.#restrictedSetter({setter, checks})
     }
 
+    get username() {
+        return super.username
+    }
+
     set username(value: string) {
         if (this.#restrictions.ignoreCredentials) return
         super.username = value
+    }
+
+    get password() {
+        return super.password
     }
 
     set password(value: string) {
@@ -128,8 +143,11 @@ class XUrl extends _ExtendedUrlMixin {
         super.password = value
     }
 
-    set hostname(value: string) {
+    get hostname() {
+        return super.hostname
+    }
 
+    set hostname(value: string) {
         // Remark : 
         // we use arrow function so that the value of "super" and "this"
         // is always taken from their parent context (the method they are executed in)
@@ -141,8 +159,11 @@ class XUrl extends _ExtendedUrlMixin {
         this.#restrictedSetter({setter, checks})
     }
 
-    set host(value: string) {
+    get host() {
+        return super.host
+    }
 
+    set host(value: string) {
         // Remark : 
         // we use arrow function so that the value of "super" and "this"
         // is always taken from their parent context (the method they are executed in)
@@ -154,8 +175,11 @@ class XUrl extends _ExtendedUrlMixin {
         this.#restrictedSetter({setter, checks})
     }
 
-    set port(value: string) {
+    get port() {
+        return super.port
+    }
 
+    set port(value: string) {
         // Remark : 
         // we use arrow function so that the value of "super" and "this"
         // is always taken from their parent context (the method they are executed in)
