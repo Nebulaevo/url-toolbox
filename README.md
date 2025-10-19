@@ -15,7 +15,7 @@ Provides a collection of classes to extend or complete the `URL` class.
 
 Class extending `URL` with representation utils, setter shortcuts, and the abililty to limit the allowed protocols and hosts, or to ignore credentials.
 
-ℹ️ Setter shortcuts an representation utils are common between `XUrl` & `RelativeUrl` and are detailed here : [`XUrl` & `RelativeUrl` common utils](#xurl--relativeurl--common-utils)
+ℹ️ Setter shortcuts and representation utils are common between `XUrl` & `RelativeUrl` and are detailed here : [`XUrl` & `RelativeUrl` common utils](#xurl--relativeurl--common-utils)
 
 ### Restrictions
 
@@ -122,11 +122,12 @@ XUrl.canParse('javascript:alert("XSS")') // -> false (javascript: is not in the 
 
 ## URL subclass : `RelativeUrl`
 
-Class extending `URL` to handle relative http url (includes the same representation utils and setter shortcuts as `XUrl`).
+Class extending `URL` to represent a relative http url (includes the same representation utils and setter shortcuts as `XUrl`).
 
-An instance of `RelativeUrl` will always ignore all values from the url base (protcol, username, password, host, hostname, port).
+Attributes describing the the url "base" are **read only** and contains an empty string (protocol, username, password, host, hostname or port).\
+The href attribute can receive a relative url string, or a full url, in which case it will just ignore the url base.
 
-ℹ️ Setter shortcuts an representation utils are common between `XUrl` & `RelativeUrl` and are detailed here : [`XUrl` & `RelativeUrl` common utils](#xurl--relativeurl--common-utils)
+ℹ️ Setter shortcuts and representation utils are common between `XUrl` & `RelativeUrl` and are detailed here : [`XUrl` & `RelativeUrl` common utils](#xurl--relativeurl--common-utils)
 
 ### Instance Creation
 
@@ -144,11 +145,13 @@ urlB.toString() // -> /my/path/?query=banana
 urlC.toString() // -> /my/path/?query=banana
 
 urlA.href = '/articles/'
-urlA.toString() // -> /articles/
+urlA.href // -> /articles/
 
-// url base will always be ignored
+// href can accept full urls and will just ignore the base of the given url
 urlB.href = 'https://domain.com/my/path/?query=banana'
-urlB.toString() // -> /my/path/?query=banana
+urlB.href // -> /my/path/?query=banana
+
+urlB.protocol = 'http:' // -> throws error (trying to assign to readonly property)
 ```
 
 ### `RelativeUrl.canParse`
