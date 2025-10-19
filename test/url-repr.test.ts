@@ -5,6 +5,11 @@ import RelativeUrl from '../src/classes/relative-url'
 
 describe("#UrlRepr", () => {
     
+    // Remark: 
+    // as getUrlReprInstances creates UrlRepr instances
+    // from URL, XUrl and RelativeUrl instances, we don't need to test
+    // instance creation here
+
     it('"normalisedPathname" & "normalisedSearch ": attrs return expected values', () => {
         const testData = [
             // no url tail
