@@ -16,9 +16,9 @@ function getUrlReprInstances(urlString: string) {
     const relativeUrl = new RelativeUrl(urlString)
 
     return {
-        urlRepr: new UrlRepr(url), 
-        xUrlRepr: new UrlRepr(xUrl), 
-        relativeUrlRepr: new UrlRepr(relativeUrl)
+        url, urlRepr: new UrlRepr(url), 
+        xUrl, xUrlRepr: new UrlRepr(xUrl), 
+        relativeUrl, relativeUrlRepr: new UrlRepr(relativeUrl)
     }
 }
 
