@@ -4,7 +4,6 @@ import { canParseXUrl } from "../helpers/can-parse.js"
 import { 
     checkProtocol, 
     checkHost, 
-    applyCredentialsRestriction, 
     toProtocolArray 
 } from "../helpers/restrictions.js"
 
@@ -42,10 +41,7 @@ class XUrl extends _ExtendedUrlMixin {
         checkHost(this, this.#restrictions.allowedHosts)
         
         // Forces values of credentials if not allowed
-        applyCredentialsRestriction({
-            url: this,
-            ignoreCredentials: this.#restrictions.ignoreCredentials
-        })
+        this.#applyCredentialsRestriction()
     }
 
     #buildRestrictionsObject(restrictions?: Partial<XUrl.UrlRestrictions_T>): XUrl.UrlRestrictions_T {
@@ -65,6 +61,15 @@ class XUrl extends _ExtendedUrlMixin {
             ignoreCredentials: isBool(ignoreCredentials) 
                 ? ignoreCredentials : false,
         }
+    }
+
+    #applyCredentialsRestriction() {
+        if (this.#restrictions.ignoreCredentials) {
+            // if restricted 
+            // we need to reach for the parent setters
+            super.username = ''
+            super.password = ''
+        }   
     }
 
     #restrictedSetter(kwargs: XUrl.RestrictedSetterKwargs_T) {
@@ -99,10 +104,7 @@ class XUrl extends _ExtendedUrlMixin {
             checkHost(this, this.#restrictions.allowedHosts)
 
             // Forces values of credentials if not allowed
-            applyCredentialsRestriction({
-                url: this,
-                ignoreCredentials: this.#restrictions.ignoreCredentials
-            })
+            this.#applyCredentialsRestriction()
         }
 
         this.#restrictedSetter({setter, checks})

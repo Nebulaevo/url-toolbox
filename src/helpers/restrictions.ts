@@ -12,7 +12,7 @@ const DEFAULT_PROTOCOL_WHITELIST = new Set([
 function toProtocolArray(protocolList: string[]) {
     return protocolList.map(item => {
         let protocol = item.trim()
-        if (protocol.endsWith(':')) {
+        if (!protocol.endsWith(':')) {
             protocol += ':'
         }
         return protocol
@@ -40,24 +40,8 @@ function checkHost(url: URL, whitelist?:string[]) {
     )
 }
 
-/** if credentials are not allowed, we force their value to an empty string */
-function applyCredentialsRestriction ({url, ignoreCredentials}: applyCredentialsRestriction.Kwargs_T) {
-    if (ignoreCredentials) {
-        url.username = ''
-        url.password = ''
-    }    
-}
-
-namespace applyCredentialsRestriction {
-    export type Kwargs_T = {
-        url: URL, 
-        ignoreCredentials: boolean
-    }
-}
-
 export {
     toProtocolArray,
     checkProtocol,
     checkHost,
-    applyCredentialsRestriction,
 }
