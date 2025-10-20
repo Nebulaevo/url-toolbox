@@ -7,7 +7,7 @@ import { instancesAreEquivalent } from './helpers/instance-comparaison'
 
 describe("#URL sub-class cohence", () => {
 
-    it('"XUrl and RelativeUrl" : behaviour is coherent with the native URL class', () => {
+    it('"XUrl and RelativeUrl" : operations behaviour is coherent with the native URL class', () => {
         // Testing behaviour on common operations between URL, XUrl and RelativeUrl
 
         const {
@@ -41,7 +41,7 @@ describe("#URL sub-class cohence", () => {
         }
     })
 
-    it('"XUrl" : behaviour is coherent with the native URL class', () => {
+    it('"XUrl" : operations behaviour is coherent with the native URL class', () => {
         // Testing behaviour on operations that are ignored in RelativeUrl
 
         const urlStrings = [
@@ -58,7 +58,7 @@ describe("#URL sub-class cohence", () => {
             const transformations = [
                 (url: URL) => url.protocol = 'http:',
                 (url: URL) => url.protocol = 'ftp', // without ':'
-                (url: URL) => url.username = 'jh:on',
+                (url: URL) => url.username = 'jo:hn',
                 (url: URL) => url.password = 'doe@doe',
                 (url: URL) => url.host = 'other.example.com:8032',
                 (url: URL) => url.hostname = 'something.com',
@@ -76,6 +76,38 @@ describe("#URL sub-class cohence", () => {
                     `Same transformation produced a different result : url: ${url} -- xUrl: ${xUrl}`
                 ).toBe(true)
             }
+        }
+    })
+
+    it('"XUrl" : trying to initialise an instance form invalid url fails', () => {
+        // Testing that XUrl fails to initialise with invalid urls, like the native URL class
+
+        const invalidArgs: [any, any][] = [
+            // invalid urls with no base
+            ['justastring', undefined],
+            ['http://in valid.com', undefined],
+            ['://missing-protocol.com', undefined],
+            ['http//missing-colon.com', undefined],
+            ['http://', undefined],
+            ['', undefined],
+            [null, undefined],
+            [undefined, undefined],
+            [12345, undefined],
+            [{}, undefined],
+
+            // invalid bases
+            ['/', 'justastring'],
+            ['/', 'http://in valid.com'],
+            ['/', '://missing-protocol.com'],
+            ['/', 'http//missing-colon.com'],
+            ['/', 'http://'],
+            ['/', ''],
+            ['/', 12345],
+            ['/', {}],
+        ]
+
+        for (const args of invalidArgs) {
+            expect(() => new XUrl(...args)).toThrowError(TypeError)
         }
     })
 })
