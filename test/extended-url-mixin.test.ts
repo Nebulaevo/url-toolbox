@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 import UrlRepr from '../src/classes/url-repr'
 
-import { getExtendedUrlInstances } from './helpers/get-instances'
+import { getTestInstances } from './helpers/get-instances'
 
 
 
@@ -36,7 +36,7 @@ describe("#ExtendedUrlMixin", () => {
         
 
         for (const {arg, result} of testData) {            
-            const { xUrl, relativeUrl } = getExtendedUrlInstances(
+            const { xUrl, relativeUrl } = getTestInstances(
                 'https://user:password@sub.domain.com:8000/test/?query=fish&filter=yellow'
             )
 
@@ -61,7 +61,7 @@ describe("#ExtendedUrlMixin", () => {
         ]
         
         for (const invalidArg of testData) {            
-            const { xUrl, relativeUrl } = getExtendedUrlInstances(
+            const { xUrl, relativeUrl } = getTestInstances(
                 'https://user:password@sub.domain.com:8000/test/?query=fish&filter=yellow'
             )
 
@@ -76,7 +76,7 @@ describe("#ExtendedUrlMixin", () => {
 
     it('"as" : returns an instance of UrlRepr and caches it', () => {
 
-        const { xUrl, relativeUrl } = getExtendedUrlInstances(
+        const { xUrl, relativeUrl } = getTestInstances(
             'https://user:password@sub.domain.com:8000/test/?query=fish&filter=yellow'
         )
 

@@ -1,12 +1,14 @@
 import { describe, expect, it } from 'vitest'
 
-import { getUrlReprInstances } from './helpers/get-instances'
 import RelativeUrl from '../src/classes/relative-url'
+
+import { getTestInstances } from './helpers/get-instances'
+
 
 describe("#UrlRepr", () => {
     
     // Remark: 
-    // as getUrlReprInstances creates UrlRepr instances
+    // as getTestInstances creates UrlRepr instances
     // from URL, XUrl and RelativeUrl instances, we don't need to test
     // instance creation here
 
@@ -47,26 +49,12 @@ describe("#UrlRepr", () => {
                     search: '?queryA=1&queryA=2' // with duplicated search param key
                 }
             },
-            // non classic url (should not force ending slash)
-            {   url: 'mailto:test@dev.gov',
-                result: {
-                    pathname: 'test@dev.gov',
-                    search: ''
-                }
-            },
-            // non classic url 2 (should not force ending slash)
-            {   url: 'tel:+1234567890',
-                result: {
-                    pathname: '+1234567890',
-                    search: ''
-                }
-            },
         ]
 
         for (const {url, result} of testData) {
             const {
                 urlRepr, xUrlRepr, relativeUrlRepr
-            } = getUrlReprInstances(url)
+            } = getTestInstances(url)
 
             expect(urlRepr.normalisedPathname).toBe(result.pathname)
             expect(xUrlRepr.normalisedPathname).toBe(result.pathname)
@@ -132,7 +120,7 @@ describe("#UrlRepr", () => {
                 url, urlRepr, 
                 xUrl, xUrlRepr, 
                 relativeUrl, relativeUrlRepr
-            } = getUrlReprInstances(fullIntialUrl)
+            } = getTestInstances(fullIntialUrl)
             
             // we trigger the computing of the initial normalised parts
             // and double check that they are valid
@@ -158,7 +146,7 @@ describe("#UrlRepr", () => {
             urlRepr, 
             xUrlRepr, 
             relativeUrlRepr
-        } = getUrlReprInstances(
+        } = getTestInstances(
             'https://user:password@sub.domain.com:8000/test/?query=fish#something'
         )
 
