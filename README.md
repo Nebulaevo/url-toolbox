@@ -122,16 +122,16 @@ XUrl.canParse('javascript:alert("XSS")') // -> false (javascript: is not in the 
 
 ## URL subclass : `RelativeUrl`
 
-Class extending `URL` to represent a relative http url (includes the same representation utils and setter shortcuts as `XUrl`).
+Class extending `URL` to represent a relative http url, with representation utils, and setter shortcuts,.
 
-Attributes describing the the url "base" are **read only** and contains an empty string (protocol, username, password, host, hostname or port).\
-The href attribute can receive a relative url string, or a full url, in which case it will just ignore the url base.
 
 ℹ️ Setter shortcuts and representation utils are common between `XUrl` & `RelativeUrl` and are detailed here : [`XUrl` & `RelativeUrl` common utils](#xurl--relativeurl--common-utils)
 
 ### Instance Creation
 
-Instances can be created with `new` or `RelativeUrl.parse`
+Instances can be created with `new` or `RelativeUrl.parse`, with a relative or an absolute url string.\
+If using an absolute url string, the expected protocol is http:, or https:, use of any other protocol will fail with a `TypeError`.
+
 
 ```js
 import { RelativeUrl } from 'url-toolbox'
@@ -144,17 +144,48 @@ urlA.toString() // -> /my/path/?query=banana
 urlB.toString() // -> /my/path/?query=banana
 urlC.toString() // -> /my/path/?query=banana
 
-urlA.href = '/articles/'
-urlA.href // -> /articles/
-
-// href can accept full urls and will just ignore the base of the given url
-urlB.href = 'https://domain.com/my/path/?query=banana'
-urlB.href // -> /my/path/?query=banana
-
-urlB.protocol = 'http:' // -> throws error (trying to assign to readonly property)
+const urlD = new RelativeUrl('mailto:me@box.house') // -> throws error (only supports http: or https: based urls)
 ```
 
-### `RelativeUrl.canParse`
+### Attributes and Operations
+
+#### Url base attributes
+
+In a `RelativeUrl` instance, attributes describing the the url "base" are **read only** and overridden to return an empty string (protocol, username, password, host, hostname or port).
+
+```js
+const url = RelativeUrl.parse('https://domain.com/my/path/?query=banana')
+
+url.protocol // -> ""
+url.username // -> ""
+url.password // -> ""
+url.host // -> ""
+url.hostname // -> ""
+url.port // -> ""
+
+
+url.hostname = "domain.com" // -> throws error (trying to assign to readonly property)
+```
+
+#### `href`
+
+The `href` attribute accepts relative or absolute url strings, but will throw a `TypeError` if given an invalid url or an absolute url with a non-http protocol.
+
+```js
+import { RelativeUrl } from 'url-toolbox'
+
+const url = new RelativeUrl('/my/path/?query=banana')
+
+url.href = 'https://domain.com/new-page/'
+url.href // -> /new-page/
+
+url.href = '/other/page/?query=fish'
+url.href // -> /other/page/?query=fish
+
+url.href = 'ftp://domain.com/path/' // -> throws error (only supports http: or https: based urls)
+```
+
+#### `RelativeUrl.canParse`
 
 `canParse` static method is modified to allow relative urls
 
@@ -163,6 +194,8 @@ import { RelativeUrl } from 'url-toolbox'
 
 RelativeUrl.canParse('/my/path/?query=banana') // -> true
 RelativeUrl.canParse('https://domain.com/my/path/?query=banana') // -> true
+
+RelativeUrl.canParse('ftp://domain.com/my/path/?query=banana') // -> false (nly supports http: or https: based urls)
 ```
 
 

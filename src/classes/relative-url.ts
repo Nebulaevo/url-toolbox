@@ -2,6 +2,16 @@ import { canParsePolyfill } from "../helpers/can-parse.js"
 
 import _ExtendedUrlMixin from "./extended-url-mixin.js"
 
+/** Helper function throwing a TypeError if the given protocol is not 'http:' or 'https:' */
+function _failForNonHttpProtocol(protocol: string) {
+    if (protocol !== 'http:' && protocol !== 'https:') {
+        throw new TypeError(
+            'RelativeUrl only supports "http:" and "https:" protocols, '
+            + `but received "${protocol}"`
+        )
+    }
+}
+
 /** Class extending URL to generate base-less http urls 
  * 
  * ℹ️ This class overrides / prevents access to the url base values.
@@ -32,6 +42,7 @@ class RelativeUrl extends _ExtendedUrlMixin {
         if (url instanceof RelativeUrl) url = url.toString()
 
         super(url ?? '/', RelativeUrl.#DUMMY_ORIGIN)
+        _failForNonHttpProtocol(this.protocol)
         this.#instanceSetUp()
     }
 
@@ -72,8 +83,11 @@ class RelativeUrl extends _ExtendedUrlMixin {
     }
 
     set href(value: string) {
+        // href should fail for non valid values
+        // (behiour in line with URL implementation)
         const parsedUrl = new URL(value, RelativeUrl.#DUMMY_ORIGIN)
-
+        _failForNonHttpProtocol(parsedUrl.protocol)
+        
         this.pathname = parsedUrl.pathname
         this.search = parsedUrl.search
         this.hash = parsedUrl.hash
