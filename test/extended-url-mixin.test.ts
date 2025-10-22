@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 import UrlRepr from '../src/classes/url-repr'
 
-import { getTestInstances } from './helpers/get-instances'
+import { getTestInstances } from './helpers/get-test-instances'
 
 
 

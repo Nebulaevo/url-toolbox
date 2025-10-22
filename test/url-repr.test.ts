@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 import RelativeUrl from '../src/classes/relative-url'
 
-import { getTestInstances } from './helpers/get-instances'
+import { getTestInstances } from './helpers/get-test-instances'
 
 
 describe("#UrlRepr", () => {

@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 import XUrl from '../src/classes/xurl'
 
-import { getTestInstances } from './helpers/get-instances'
+import { getTestInstances } from './helpers/get-test-instances'
 import { instancesAreEquivalent } from './helpers/instance-comparaison'
 
 describe("#URL sub-class cohence", () => {
@@ -108,6 +108,7 @@ describe("#URL sub-class cohence", () => {
 
         for (const args of invalidArgs) {
             expect(() => new XUrl(...args)).toThrowError(TypeError)
+            expect(XUrl.parse(...args)).toBe(null)
         }
     })
 })
