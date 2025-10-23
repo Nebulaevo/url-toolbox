@@ -128,12 +128,12 @@ describe("#RelativeUrl", () => {
         }    
     })
 
-    it('"base url attributes" : are readonly', () => {
-        
-        const relativeUrl = new RelativeUrl('https://bob:password123@some.where.gg:8008/sea/?query=fish#test')
+    it('"base url attributes" : modification attempts are ignored', () => {
 
-        const invalidOperations = [
-            (url:any) => url.origin = 'https://new-domain.com', // we also test origin for sanity
+        const referenceUrl = new URL('https://bob:password123@some.where.gg:8008/sea/?query=fish#test')
+        const relativeUrl = new RelativeUrl(referenceUrl)
+
+        const transformations = [
             (url:URL) => url.protocol = 'ftp',
             (url:URL) => url.username = 'user',
             (url:URL) => url.password = 'password',
@@ -142,8 +142,9 @@ describe("#RelativeUrl", () => {
             (url:URL) => url.port = '8000',
         ] as const
 
-        for (const operation of invalidOperations) {
-            expect(()=>operation(relativeUrl)).toThrowError(TypeError)
+        for (const transform of transformations) {
+            transform(relativeUrl)
+            expect(instancesAreEquivalent(referenceUrl, relativeUrl)).toBe(true)
         }    
     })
 })

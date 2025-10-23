@@ -42,7 +42,7 @@ class RelativeUrl extends _ExtendedUrlMixin {
         if (url instanceof RelativeUrl) url = url.toString()
 
         super(url ?? '/', RelativeUrl.#DUMMY_ORIGIN)
-        _failForNonHttpProtocol(this.protocol)
+        _failForNonHttpProtocol(super.protocol)
         this.#instanceSetUp()
     }
 
@@ -57,12 +57,12 @@ class RelativeUrl extends _ExtendedUrlMixin {
             value: ''
         }
         
-        Object.defineProperty(this, 'protocol', ignoredValueDescriptor)
-        Object.defineProperty(this, 'port', ignoredValueDescriptor)
-        Object.defineProperty(this, 'username', ignoredValueDescriptor)
-        Object.defineProperty(this, 'password', ignoredValueDescriptor)
-        Object.defineProperty(this, 'host', ignoredValueDescriptor)
-        Object.defineProperty(this, 'hostname', ignoredValueDescriptor)
+        // Object.defineProperty(this, 'protocol', ignoredValueDescriptor)
+        // Object.defineProperty(this, 'port', ignoredValueDescriptor)
+        // Object.defineProperty(this, 'username', ignoredValueDescriptor)
+        // Object.defineProperty(this, 'password', ignoredValueDescriptor)
+        // Object.defineProperty(this, 'host', ignoredValueDescriptor)
+        // Object.defineProperty(this, 'hostname', ignoredValueDescriptor)
     }
 
     #forceDummyBase() {
@@ -92,6 +92,24 @@ class RelativeUrl extends _ExtendedUrlMixin {
         this.search = parsedUrl.search
         this.hash = parsedUrl.hash
     }
+
+    get protocol() { return '' }
+    set protocol(_: string) {}
+
+    get username() { return '' }
+    set username(_: string) {}
+
+    get password() { return '' }
+    set password(_: string) {}
+
+    get host() { return '' }
+    set host(_: string) {}
+
+    get hostname() { return '' }
+    set hostname(_: string) {}
+
+    get port() { return '' }
+    set port(_: string) {}
 
     toJSON(): string {
         return this.href

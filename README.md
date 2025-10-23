@@ -130,7 +130,7 @@ Class extending `URL` to represent a relative http url, with representation util
 ### Instance Creation
 
 Instances can be created with `new` or `RelativeUrl.parse`, with a relative or an absolute url string.\
-If using an absolute url string, the expected protocol is http:, or https:, use of any other protocol will fail with a `TypeError`.
+If using an absolute url string, the protocol should be http:, or https:, use of any other protocol will fail with a `TypeError`.
 
 
 ```js
@@ -151,10 +151,19 @@ const urlD = new RelativeUrl('mailto:me@box.house') // -> throws error (only sup
 
 #### Url base attributes
 
-In a `RelativeUrl` instance, attributes describing the the url "base" are **read only** and overridden to return an empty string (protocol, username, password, host, hostname or port).
+In a `RelativeUrl` instance, attributes describing the url base are deactivated (protocol, username, password, host, hostname or port).
+They will always return an empty string, and any attempt to modify their value will be ignored.
 
 ```js
-const url = RelativeUrl.parse('https://domain.com/my/path/?query=banana')
+// all of those attempts at setting url base related attributes are ignored
+const url = RelativeUrl.parse('https://user:password@domain.com:8080/my/path/?query=banana')
+
+url.protocol = 'https:'
+url.username = 'user'
+url.password = 'password'
+url.host = 'domain.com:8080'
+url.hostname = 'domain.com'
+url.port = '8080'
 
 url.protocol // -> ""
 url.username // -> ""
@@ -162,9 +171,6 @@ url.password // -> ""
 url.host // -> ""
 url.hostname // -> ""
 url.port // -> ""
-
-
-url.hostname = "domain.com" // -> throws error (trying to assign to readonly property)
 ```
 
 #### `href`
@@ -195,7 +201,7 @@ import { RelativeUrl } from 'url-toolbox'
 RelativeUrl.canParse('/my/path/?query=banana') // -> true
 RelativeUrl.canParse('https://domain.com/my/path/?query=banana') // -> true
 
-RelativeUrl.canParse('ftp://domain.com/my/path/?query=banana') // -> false (nly supports http: or https: based urls)
+RelativeUrl.canParse('ftp://domain.com/my/path/?query=banana') // -> false (only supports http: or https: based urls)
 ```
 
 
