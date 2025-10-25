@@ -1,23 +1,141 @@
 # 📬 URL Toolbox
 **The `URL` class, upgraded.**
 
-Provides a collection of classes to extend or complete the `URL` class.
+Provides a collection of classes to extend or complete the built-in `URL` class.
+
+- 🔒 `XUrl` : to create secure restricted `URL` instances with custom whitelisted hosts and protocols
+
+- 👉 `RelativeUrl` : to create relative http / https `URL` instances, without any url base
+
+- 📷 `UrlRepr` : helper class providing representation methods for a `URL` instance
 
 ## Table of Contents
 
-- [URL subclass : `XUrl`](#url-subclass--xurl)
-- [URL subclass : `RelativeUrl`](#url-subclass--relativeurl)
-- [`XUrl` & `RelativeUrl` : common utils](#xurl--relativeurl--common-utils)
+- [Extended `URL` classes](#extended-url-classes--xurl--relativeurl)
+    - [`XUrl`](#xurl--for-absolute-urls)
+    - [`RelativeUrl`](#relativeurl-for-relative-httphttps-urls)
 - [Representation helper class : `UrlRepr`](#representation-helper-class--urlrepr)
 - [Additional types](#types)
 
-## URL subclass : `XUrl`
+## Extended `URL` classes : `XUrl` & `RelativeUrl`
 
-Class extending `URL` with representation utils, setter shortcuts, and the abililty to limit the allowed protocols and hosts, or to ignore credentials.
+Both classes extend the native `URL` class with :
+- **An `as` attribute :**\
+Returns a `UrlRepr` instance linked to the current instance, providing multiple representation helpers for the url (see [Representation helper class : `UrlRepr`](#representation-helper-class--urlrepr))
 
-ℹ️ Setter shortcuts and representation utils are common between `XUrl` & `RelativeUrl` and are detailed here : [`XUrl` & `RelativeUrl` common utils](#xurl--relativeurl--common-utils)
+```js
+import { XUrl, RelativeUrl } from 'url-toolbox'
 
-### Restrictions
+const url = new XUrl('http://my-domain.com/path?query2=value2&query1=value1')
+const relativeUrl = new RelativeUrl('/somewhere?query2=value2&query1=value1')
+
+url.as.normalised() // -> http://my-domain.com/path/?query1=value1&query2=value2
+relativeUrl.as.normalised() // -> /somewhere/?query1=value1&query2=value2
+
+url.as.filtered({
+    search: false
+}) // -> http://my-domain.com/path
+
+relativeUrl.as.filtered({
+    search: false
+}) // -> /somewhere
+```
+
+<br>
+
+- **Extended Attribute Setters:**\
+    Attribute setters are overridden to throw a `TypeError` for invalid argument types, preventing common silent failures.\
+    Additionnally, some attributes are extended with alternative setting options (`port`, `pathname` and `search`).
+
+| Attribute | Allowed Setter Values and their Behaviour |
+| :--- | :----- |
+| `protocol` | *✱ This restriction is only applied for `XUrl` instances as this attribute is ignored by `RelativeUrl` instances*<br><br>➤ **`string`** : calls default URL setter |
+| `username` | *✱ This restriction is only applied for `XUrl` instances as this attribute is ignored by `RelativeUrl` instances*<br><br>➤ **`string`** : calls default URL setter|
+| `password` | *✱ This restriction is only applied for `XUrl` instances as this attribute is ignored by `RelativeUrl` instances*<br><br>➤ **`string`** : calls default URL setter |
+| `host` | *✱ This restriction is only applied for `XUrl` instances as this attribute is ignored by `RelativeUrl` instances*<br><br>➤ **`string`** : calls default URL setter |
+| `hostname` | *✱ This restriction is only applied for `XUrl` instances as this attribute is ignored by `RelativeUrl` instances*<br><br>➤ **`string`** : calls default URL setter |
+| `port` | *✱ This restriction is only applied for `XUrl` instances as this attribute is ignored by `RelativeUrl` instances*<br><br>➤ **`number` or `string` (representing a positive number)** : checks that the given value can be converted to a valid integer before calling the default URL setter|
+| `pathname` | ➤ **`string`** : calls default URL pathname setter<hr> ➤ **`string array`** : encodes each elements of the array and assembles them to build the path (usefull if building paths from dynamic values) |
+| `search` | ➤ **`string`** : calls default URL setter<hr> ➤ **`URLSearchParams` or `key/value object with string values`** : converted to a search string before calling the default URL search setter |
+| `hash` | ➤ **`string`** : calls default URL setter |
+
+Here are some examples to illustrate the additionnal type restrictions on attribute setters :
+```js
+import { XUrl, RelativeUrl } from 'url-toolbox'
+
+const url = new XUrl('http://my-domain.com/path?query2=value2&query1=value1')
+const relativeUrl = new RelativeUrl('/somewhere?query2=value2&query1=value1')
+
+
+// Attempting to set a non expected value to an attribute setter
+// will throw a TypeError
+url.host = undefined // (expected string)
+url.port = '-10' // (expected positive number)
+url.pathname = [1,2,3] // (expected string or string array)
+relativeUrl.pathname = [1,2,3] // (expected string or string array)
+
+// Exception : 
+// url base attributes are ignored by RelativeUrl instances, 
+// so even if the value has an invalid type, 
+// no error is thrown, and the instance is not modified :
+relativeUrl.host = undefined // (ignored)
+relativeUrl.protocol = undefined // (ignored)
+```
+
+Here are some examples on how to use the alternative setter options
+```js
+import { XUrl, RelativeUrl } from 'url-toolbox'
+
+const url = new XUrl('http://my-domain.com/path?query2=value2&query1=value1')
+const relativeUrl = new RelativeUrl('/somewhere?query2=value2&query1=value1')
+
+// port can be directly set with a positive number
+// (only available in XUrl instances)
+url.port = 8000
+url.port // -> '8000'
+
+// pathanme can be set from a string array 
+// each path segment is encoded before being assembled
+url.pathname = ['single/path/segment', 'other']
+relativeUrl.pathname = ['this', 'is', 'my path']
+
+url.pathname // /single%2Fpath%2Fsegment/other/
+relativeUrl.pathname // /this/is/my%20path/
+
+// search can be set from a URLSearchParams instance
+// or from a key/value pair object containing only string values
+url.search = new URLSearchParams({
+    newQuery: 'rabbits',
+    filter: 'white'
+})
+relativeUrl.search = {
+    newQuery: 'rabbits',
+    filter: 'white'
+}
+
+url.search // ?newQuery=rabbits&filter=white
+relativeUrl.search // ?newQuery=rabbits&filter=white
+
+```
+
+### `XUrl` : for Absolute URLs
+
+This class allows to define restrictions on an instance :
+- To define the whitelisted protocols (protocols are always restricted, even if no allowed protocols are defined)
+
+- To define the whitelisted hosts
+
+- To ignore credentials (username & password) for the instance
+
+#### 🟆 `BrokenUrlRestrictionError`
+
+Type of error thrown if a protocol or host restriction is about to be broken in a XUrl instance.
+
+```js
+import {BrokenUrlRestrictionError} from 'url-toolbox'
+```
+
+#### 🟆 Restrictions Object Structure
 
 Restrictions are declared as a key/value object.\
 They are defined at instance creation, if no value is given for a key, the default value is used.
@@ -28,12 +146,7 @@ They are defined at instance creation, if no value is given for a key, the defau
 | `allowedHosts` | *String array (optionnal)*<br>Defines whitelisted hosts.<br>(should include eventual subdomain, and eventual port number, if applicable)<br><br>If defined and non empty, any attempt to use a non allowed host will throw a `BrokenUrlRestrictionError` | Not restricted |
 | `ignoreCredentials` | *Boolean (optionnal)*<br><br>If true, username and password values are erased and cannot be modified. Any attempt to set credentials anyway will be ignored but will not throw any error. | Allow credentials |
 
-
-#### `BrokenUrlRestrictionError`
-
-Type of error thrown if a protocol or host restriction is about to be broken in a XUrl instance.
-
-#### Creating and Modifying an Instance
+#### 🟆 Creating and Modifying an Instance
 
 Restrictions are set at instance creation (available both with `new` or `XUrl.canParse`)
 
@@ -59,33 +172,39 @@ const urlB = XUrl.parse(
     restrictions
 )
 
-urlA.href = 'http://wrong-domain.com/path' // -> throws an error (wrong host)
-
-urlA.protocol = 'ftp:' // -> throws an error (wrong protocol)
+// Those operations will throw an error
+urlA.href = 'http://wrong-domain.com/path' // (wrong host)
+urlA.protocol = 'ftp:' // (wrong protocol)
 ```
 
 If given url doesn't respect protocol or host restrictions at intance creation, operation will also fail with `BrokenUrlRestrictionError`
 
 ```js
+import { XUrl } from 'url-toolbox'
+
 const restrictions = {
     allowedProtocols: [ 'http:', 'https:' ],
     allowedHosts: [ 'domain.com' ]
 }
 
+// Those attempts will fail because the initial value
+// breaks host or protocol restrictions
 const urlA = new XUrl(
     'ftp://wrong-domain.com/test/path/', 
     undefined, 
     restrictions
-) // -> throws an error (wrong protocol & host)
+) // (wrong protocol & host)
 
 const urlB = new XUrl('javascript:alert("XSS")') 
-// -> throws an error (javascript: is not in the default list of allowed protocols and '' is not an allowed host)
+// -> (javascript: protocol is not in the default list of allowed protocols and '' is not an allowed host)
 
 ```
 
-If credentials are ignored, any attempt to set username or password will be ignored
+If credentials are ignored, any attempt to set username or password will be ignored, but no error will be thrown.
 
 ```js
+import { XUrl } from 'url-toolbox'
+
 // None of theese methods will succeed at setting the credentials
 const url = XUrl.parse(
     'https://user:password123@domain.com//test/path/',
@@ -100,7 +219,7 @@ url.toString() // -> 'https://domain.com//test/path/'
 ```
 
 
-#### Check URL String Validity with `XUrl.canParse`
+#### 🟆 Check URL String Validity with `XUrl.canParse`
 
 `XUrl.canParse` will also check the url string against provided (or default) restrictions
 
@@ -120,14 +239,14 @@ XUrl.canParse('javascript:alert("XSS")') // -> false (javascript: is not in the 
 ```
 
 
-## URL subclass : `RelativeUrl`
+### `RelativeUrl`: for Relative Http/Https URLs
 
-Class extending `URL` to represent a relative http url, with representation utils, and setter shortcuts,.
+This class is built around the idea of ignoring the url base (`protocol`, `username`, `password`, `host`, `hostname`, `port`).
+
+To maintain coherence with the built-in `URL` API, the base url attribute setters and getters are still accessible but will be ignored.
 
 
-ℹ️ Setter shortcuts and representation utils are common between `XUrl` & `RelativeUrl` and are detailed here : [`XUrl` & `RelativeUrl` common utils](#xurl--relativeurl--common-utils)
-
-### Instance Creation
+#### 🟆 Instance Creation
 
 Instances can be created with `new` or `RelativeUrl.parse`, with a relative or an absolute url string.\
 If using an absolute url string, the protocol should be http:, or https:, use of any other protocol will fail with a `TypeError`.
@@ -147,9 +266,7 @@ urlC.toString() // -> /my/path/?query=banana
 const urlD = new RelativeUrl('mailto:me@box.house') // -> throws error (only supports http: or https: based urls)
 ```
 
-### Attributes and Operations
-
-#### Url base attributes
+#### 🟆 Url base attributes
 
 In a `RelativeUrl` instance, attributes describing the url base are deactivated (protocol, username, password, host, hostname or port).
 They will always return an empty string, and any attempt to modify their value will be ignored.
@@ -173,7 +290,7 @@ url.hostname // -> ""
 url.port // -> ""
 ```
 
-#### `href`
+#### 🟆 `href`
 
 The `href` attribute accepts relative or absolute url strings, but will throw a `TypeError` if given an invalid url or an absolute url with a non-http protocol.
 
@@ -191,9 +308,9 @@ url.href // -> /other/page/?query=fish
 url.href = 'ftp://domain.com/path/' // -> throws error (only supports http: or https: based urls)
 ```
 
-#### `RelativeUrl.canParse`
+#### 🟆 `RelativeUrl.canParse`
 
-`canParse` static method is modified to allow relative urls
+`canParse` static method is modified to allow relative url strings
 
 ```js
 import { RelativeUrl } from 'url-toolbox'
@@ -202,53 +319,6 @@ RelativeUrl.canParse('/my/path/?query=banana') // -> true
 RelativeUrl.canParse('https://domain.com/my/path/?query=banana') // -> true
 
 RelativeUrl.canParse('ftp://domain.com/my/path/?query=banana') // -> false (only supports http: or https: based urls)
-```
-
-
-## `XUrl` & `RelativeUrl` : Common Utils
-
-### Representation Utils : `as`
-
-Each `XUrl` and `RelativeUrl` instance have an `as` key, that encapsulates representation utils for that instance.
-
-Under the hood, `as` returns a `UrlRepr` instance, that defines the representation methods linked to the current url instance.
-
-See [`UrlRepr documentation`](#representation-helper-class--urlrepr)
-
-```js
-import { XUrl, RelativeUrl } from 'url-toolbox'
-
-const url = new XUrl('http://my-domain.com/path?query2=value2&query1=value1')
-const relativeUrl = new RelativeUrl('/somewhere?query2=value2&query1=value1')
-
-url.as.normalised() // -> http://my-domain.com/path/?query1=value1&query2=value2
-relativeUrl.as.normalised() // -> /somewhere/?query1=value1&query2=value2
-
-url.as.filtered({
-    search: false
-}) // -> http://my-domain.com/path
-
-relativeUrl.as.filtered({
-    search: false
-}) // -> /somewhere/
-```
-
-### Setter Shortcut : `setPathnameSegments( segments )`
-
-Available for both `XUrl` and `RelativeUrl`, it's a shortcut method allowing to set the url's pathname from an array of strings.
-
-Accepts a string array, defining all the segments of the pathname.\
-Each item is encoded before being assemble to set the pathname value.
-
-
-```js
-import { XUrl } from 'url-toolbox'
-
-const url = new XUrl('https:/site.com/test/')
-
-url.setPathnameSegments(['articles', 'best tomato/pasta',])
-
-url.toString() // -> https://site.com/articles/best%20tomato%2Fpasta/
 ```
 
 ## Representation helper class : `UrlRepr`

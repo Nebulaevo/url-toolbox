@@ -177,11 +177,13 @@ class XUrl extends _ExtendedUrlMixin {
         this.#restrictedSetter({setter, checks})
     }
 
-    get port() {
+    get port(): string {
         return super.port
     }
 
-    set port(value: string) {
+    // @ts-ignore :
+    // force TS to accept number as a possible arg type
+    set port(value: string|number) {
         // Remark : 
         // we use arrow function so that the value of "super" and "this"
         // is always taken from their parent context (the method they are executed in)

@@ -13,7 +13,7 @@ import {
 
 describe("#RelativeUrl", () => {
 
-    it('"instance initialisation" : works with valid values', () => {
+    it('"instance initialisation" : works', () => {
         
         const urlBase = 'https://user:password@sub.domain.com:8000'
         // шеллы need to be encoded and '\uDFFF' will cause an error if given to encodeURI

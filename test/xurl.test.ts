@@ -253,10 +253,7 @@ describe("#XUrl", () => {
             (url: URL) => url.hostname = `something-${ENCOD_MALFORMED_SURROGATE}.com:8032`,
             
             (url: URL) => url.port = '8080',
-            (url: URL) => url.port = 'aaa',
-            (url: URL) => url.port = ENCOD_CYRILLIC,
-            (url: URL) => url.port = ENCOD_SURROGATE,
-            (url: URL) => url.port = ENCOD_MALFORMED_SURROGATE,
+            (url: URL) => url.port = 8080 as any,
             
             (url: URL) => url.pathname = '/newpath/',
             (url: URL) => url.pathname = 'otherpath', // without '/'

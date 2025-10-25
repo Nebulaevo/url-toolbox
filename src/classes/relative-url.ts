@@ -43,27 +43,27 @@ class RelativeUrl extends _ExtendedUrlMixin {
 
         super(url ?? '/', RelativeUrl.#DUMMY_ORIGIN)
         _failForNonHttpProtocol(super.protocol)
-        this.#instanceSetUp()
-    }
-
-    #instanceSetUp() {
         this.#forceDummyBase()
-
-        // Redefining ignored properties
-        const ignoredValueDescriptor = {
-            enumerable: false,
-            configurable: false,
-            writable: false,
-            value: ''
-        }
-        
-        // Object.defineProperty(this, 'protocol', ignoredValueDescriptor)
-        // Object.defineProperty(this, 'port', ignoredValueDescriptor)
-        // Object.defineProperty(this, 'username', ignoredValueDescriptor)
-        // Object.defineProperty(this, 'password', ignoredValueDescriptor)
-        // Object.defineProperty(this, 'host', ignoredValueDescriptor)
-        // Object.defineProperty(this, 'hostname', ignoredValueDescriptor)
     }
+
+    // #instanceSetUp() {
+    //     this.#forceDummyBase()
+
+    //     // Redefining ignored properties
+    //     const ignoredValueDescriptor = {
+    //         enumerable: false,
+    //         configurable: false,
+    //         writable: false,
+    //         value: ''
+    //     }
+        
+    //     // Object.defineProperty(this, 'protocol', ignoredValueDescriptor)
+    //     // Object.defineProperty(this, 'port', ignoredValueDescriptor)
+    //     // Object.defineProperty(this, 'username', ignoredValueDescriptor)
+    //     // Object.defineProperty(this, 'password', ignoredValueDescriptor)
+    //     // Object.defineProperty(this, 'host', ignoredValueDescriptor)
+    //     // Object.defineProperty(this, 'hostname', ignoredValueDescriptor)
+    // }
 
     #forceDummyBase() {
         super.protocol = RelativeUrl.#DUMMY_PROTOCOL
