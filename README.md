@@ -241,7 +241,7 @@ XUrl.canParse('javascript:alert("XSS")') // -> false (javascript: is not in the 
 
 ### `RelativeUrl`: for Relative Http/Https URLs
 
-This class is built around the idea of ignoring the url base (`protocol`, `username`, `password`, `host`, `hostname`, `port`).
+This class is built around the idea of ignoring the url base (`protocol`, `username`, `password`, `host`, `hostname`, or `port`).
 
 To maintain coherence with the built-in `URL` API, the base url attribute setters and getters are still accessible but will be ignored.
 
@@ -268,7 +268,7 @@ const urlD = new RelativeUrl('mailto:me@box.house') // -> throws error (only sup
 
 #### 🟆 Url base attributes
 
-In a `RelativeUrl` instance, attributes describing the url base are deactivated (protocol, username, password, host, hostname or port).
+In a `RelativeUrl` instance, attributes describing the url base are deactivated (`protocol`, `username`, `password`, `host`, `hostname`, or `port`).\
 They will always return an empty string, and any attempt to modify their value will be ignored.
 
 ```js
