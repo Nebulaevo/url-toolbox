@@ -55,7 +55,7 @@ relativeUrl.as.filtered({
 | `host` | *✱ This restriction is only applied for `XUrl` instances as this attribute is ignored by `RelativeUrl` instances*<br><br>➤ **`string`** : calls default URL setter |
 | `hostname` | *✱ This restriction is only applied for `XUrl` instances as this attribute is ignored by `RelativeUrl` instances*<br><br>➤ **`string`** : calls default URL setter |
 | `port` | *✱ This restriction is only applied for `XUrl` instances as this attribute is ignored by `RelativeUrl` instances*<br><br>➤ **`number` or `string` (representing a positive number)** : checks that the given value can be converted to a valid integer before calling the default URL setter|
-| `pathname` | ➤ **`string`** : calls default URL pathname setter<hr> ➤ **`string array`** : encodes each elements of the array and assembles them to build the path (usefull if building paths from dynamic values) |
+| `pathname` | ➤ **`string`** : calls default URL pathname setter<hr> ➤ **`string array`** : assembles a path from the given segments (usefull if building paths from dynamic values) |
 | `search` | ➤ **`string`** : calls default URL setter<hr> ➤ **`URLSearchParams` or `key/value object with string values`** : converted to a search string before calling the default URL search setter |
 | `hash` | ➤ **`string`** : calls default URL setter |
 
