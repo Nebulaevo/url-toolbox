@@ -89,12 +89,12 @@ describe("#ExtendedUrlMixin", () => {
                 result: '/text-%F0%90%8F%BF/other-text-%EF%BF%BD/'
             },
             // encoding special chars
-            {   value: [';,/?:@&=+$"`# '],
-                result: '/%3B%2C%2F%3F%3A%40%26%3D%2B%24%22%60%23%20/'
+            {   value: [';,/\\?:@&=+$"`# '],
+                result: '/;,%2F%5C%3F:@&=+$%22%60%23%20/'
             },
             // encoding special chars with surrogate
-            {   value: [ENCOD_SURROGATE + ';,/?:@&=+$"`# '+ENCOD_MALFORMED_SURROGATE],
-                result: '/%F0%90%8F%BF%3B%2C%2F%3F%3A%40%26%3D%2B%24%22%60%23%20%EF%BF%BD/'
+            {   value: [ENCOD_SURROGATE + ';,/\\?:@&=+$"`# '+ENCOD_MALFORMED_SURROGATE],
+                result: '/%F0%90%8F%BF;,%2F%5C%3F:@&=+$%22%60%23%20%EF%BF%BD/'
             },
             // non escaped chars
             {   value: ["-_.!~*'()"],

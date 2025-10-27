@@ -1,6 +1,6 @@
 import { isArray, isDict, isNumber, isString, type Dict_T } from "sniffly"
 
-import { buildPathnameFromArray } from "../helpers/pathname.js"
+import { assemblePathSegments } from "../helpers/pathname.js"
 import UrlRepr from "./url-repr.js"
 
 
@@ -151,12 +151,9 @@ class _ExtendedUrlMixin extends URL {
     set pathname(value: string|string[]) {
         // 1. handling alternative types
         if (isArray(value, {itemType:'string'})) {
-            value = buildPathnameFromArray(value)
-        }
-
-        // 2. calling the parent setter 
-        // or throwing an error if the value's type is not string
-        if (isString(value)) super.pathname = value
+            super.pathname = assemblePathSegments(value)
+        
+        } else if (isString(value)) super.pathname = value
         else this.#throwAttrTypeError({
             attr: 'pathname',
             acceptedTypes: 'string, or string array',
