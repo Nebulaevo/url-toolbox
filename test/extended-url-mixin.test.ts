@@ -72,6 +72,12 @@ describe("#ExtendedUrlMixin", () => {
             },
             {   value: ['my', 'PATH'],
                 result: '/my/PATH/'
+            }, // multiple '/'
+            {   value: ['/my/', 'PATH//'],
+                result: '/%2Fmy%2F/PATH%2F%2F/'
+            }, // multiple '\\'
+            {   value: ['\\my\\', 'PATH\\\\'],
+                result: '/%5Cmy%5C/PATH%5C%5C/'
             },
             // encoding : non-ascii characters
             {   value: [ENCOD_CYRILLIC], // encoding 
