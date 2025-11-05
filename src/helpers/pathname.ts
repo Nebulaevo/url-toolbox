@@ -1,9 +1,4 @@
 
-const URI_ENCODED = {
-    'slash': encodeURIComponent('/'),
-    'anti-slash': encodeURIComponent('\\'),
-}
-
 /** Assembling pathname segments into a path string
  * 
  * This function is just in charge of making sure that no accidental sub-segment is created.
@@ -15,8 +10,9 @@ function assemblePathSegments(pathSegments: string[]): string {
     
     const path = pathSegments.map(
         (segment) => segment
-            .replace(/\//g, URI_ENCODED["slash"])
-            .replace(/\\/g, URI_ENCODED["anti-slash"])
+            // find & replace all "/" and "\" characters 
+            // to prevent accidentally creating more path segments
+            .replace(/[\\\/]/g, encodeURIComponent)
     ).join('/')
 
     return '/' + path + '/'
