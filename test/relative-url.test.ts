@@ -5,9 +5,9 @@ import XUrl from '../src/classes/xurl'
 
 import { instancesAreEquivalent } from './helpers/instance-comparaison'
 import {
-    ENCOD_CYRILLIC,
-    ENCOD_SURROGATE,
-    ENCOD_MALFORMED_SURROGATE
+    CYRILLIC,
+    SURROGATE,
+    MALFORMED_SURROGATE,
 } from './helpers/encoding-test-values'
 
 
@@ -17,7 +17,7 @@ describe("#RelativeUrl", () => {
         
         const urlBase = 'https://user:password@sub.domain.com:8000'
         // шеллы need to be encoded and '\uDFFF' will cause an error if given to encodeURI
-        const urlTail = `/test/${ENCOD_CYRILLIC}/${ENCOD_SURROGATE}/${ENCOD_MALFORMED_SURROGATE}/?query=fish&filter=yellow`
+        const urlTail = `/test/${CYRILLIC.raw}/${SURROGATE.raw}/${MALFORMED_SURROGATE.raw}/?query=fish&filter=yellow`
         const fullUrl = urlBase + urlTail
         const referenceUrl = new URL(fullUrl)
         
@@ -48,33 +48,33 @@ describe("#RelativeUrl", () => {
         const transformations = [
             (url: URL) => url.pathname = '/newpath/',
             (url: URL) => url.pathname = 'otherpath', // without '/'
-            (url: URL) => url.pathname = `/path/${ENCOD_CYRILLIC}/`,
-            (url: URL) => url.pathname = `/path/${ENCOD_SURROGATE}/`,
-            (url: URL) => url.pathname = `/path/${ENCOD_MALFORMED_SURROGATE}/`,
+            (url: URL) => url.pathname = `/path/${CYRILLIC.raw}/`,
+            (url: URL) => url.pathname = `/path/${SURROGATE.raw}/`,
+            (url: URL) => url.pathname = `/path/${MALFORMED_SURROGATE.raw}/`,
             
             (url: URL) => url.search = '?newquery=1',
             (url: URL) => url.search = 'otherquery=2', // without '?'
-            (url: URL) => url.search = `?search=${ENCOD_CYRILLIC}`,
-            (url: URL) => url.search = `?search=${ENCOD_SURROGATE}`,
-            (url: URL) => url.search = `?search=${ENCOD_MALFORMED_SURROGATE}`,
+            (url: URL) => url.search = `?search=${CYRILLIC.raw}`,
+            (url: URL) => url.search = `?search=${SURROGATE.raw}`,
+            (url: URL) => url.search = `?search=${MALFORMED_SURROGATE.raw}`,
             
             (url: URL) => url.hash = '#section2',
             (url: URL) => url.hash = 'section3', // without '#'
-            (url: URL) => url.hash = `#${ENCOD_CYRILLIC}`,
-            (url: URL) => url.hash = `#${ENCOD_SURROGATE}`,
-            (url: URL) => url.hash = `#${ENCOD_MALFORMED_SURROGATE}`,
+            (url: URL) => url.hash = `#${CYRILLIC.raw}`,
+            (url: URL) => url.hash = `#${SURROGATE.raw}`,
+            (url: URL) => url.hash = `#${MALFORMED_SURROGATE.raw}`,
 
             (url: URL) => url.href = 'http://www.somewhere.zz/some/path?hello=world#cake',
             (url: URL) => url.href = 'http://www.somewhere.zz', // no tail
-            (url: URL) => url.href = `http://www.somewhere.zz/${ENCOD_CYRILLIC}/path?hello=world#cake`,
-            (url: URL) => url.href = `http://www.somewhere.zz/${ENCOD_SURROGATE}/path?hello=world#cake`,
-            (url: URL) => url.href = `http://www.somewhere.zz/${ENCOD_MALFORMED_SURROGATE}/path?hello=world#cake`,
-            (url: URL) => url.href = `http://www.somewhere.zz/path?hello=${ENCOD_CYRILLIC}#cake`,
-            (url: URL) => url.href = `http://www.somewhere.zz/path?hello=${ENCOD_SURROGATE}#cake`,
-            (url: URL) => url.href = `http://www.somewhere.zz/path?hello=${ENCOD_MALFORMED_SURROGATE}#cake`,
-            (url: URL) => url.href = `http://www.somewhere.zz/path?hello=world#${ENCOD_CYRILLIC}`,
-            (url: URL) => url.href = `http://www.somewhere.zz/path?hello=world#${ENCOD_SURROGATE}`,
-            (url: URL) => url.href = `http://www.somewhere.zz/path?hello=world#${ENCOD_MALFORMED_SURROGATE}`,   
+            (url: URL) => url.href = `http://www.somewhere.zz/${CYRILLIC.raw}/path?hello=world#cake`,
+            (url: URL) => url.href = `http://www.somewhere.zz/${SURROGATE.raw}/path?hello=world#cake`,
+            (url: URL) => url.href = `http://www.somewhere.zz/${MALFORMED_SURROGATE.raw}/path?hello=world#cake`,
+            (url: URL) => url.href = `http://www.somewhere.zz/path?hello=${CYRILLIC.raw}#cake`,
+            (url: URL) => url.href = `http://www.somewhere.zz/path?hello=${SURROGATE.raw}#cake`,
+            (url: URL) => url.href = `http://www.somewhere.zz/path?hello=${MALFORMED_SURROGATE.raw}#cake`,
+            (url: URL) => url.href = `http://www.somewhere.zz/path?hello=world#${CYRILLIC.raw}`,
+            (url: URL) => url.href = `http://www.somewhere.zz/path?hello=world#${SURROGATE.raw}`,
+            (url: URL) => url.href = `http://www.somewhere.zz/path?hello=world#${MALFORMED_SURROGATE.raw}`,   
         ]
             
         for (const transform of transformations) {

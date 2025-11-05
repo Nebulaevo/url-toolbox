@@ -1,10 +1,22 @@
 
-const ENCOD_CYRILLIC = "шеллы"
-const ENCOD_SURROGATE = "\uD800\uDFFF"
-const ENCOD_MALFORMED_SURROGATE = "\uD800"
+const CYRILLIC = {
+    raw: "шеллы",
+    encoded: "%D1%88%D0%B5%D0%BB%D0%BB%D1%8B"
+} as const
+
+const SURROGATE = {
+    raw: "\uD800\uDFFF",
+    encoded: "%F0%90%8F%BF"
+} as const 
+
+const MALFORMED_SURROGATE = {
+    raw: "\uD800",
+    encoded: "%EF%BF%BD"
+} as const
+
 
 export {
-    ENCOD_CYRILLIC,
-    ENCOD_SURROGATE,
-    ENCOD_MALFORMED_SURROGATE
+    CYRILLIC,
+    SURROGATE,
+    MALFORMED_SURROGATE,
 }

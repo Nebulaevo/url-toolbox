@@ -6,9 +6,9 @@ import RelativeUrl from '../src/classes/relative-url'
 
 import { instancesAreEquivalent } from './helpers/instance-comparaison'
 import {
-    ENCOD_CYRILLIC,
-    ENCOD_SURROGATE,
-    ENCOD_MALFORMED_SURROGATE
+    CYRILLIC,
+    SURROGATE,
+    MALFORMED_SURROGATE,
 } from './helpers/encoding-test-values'
 
 
@@ -20,7 +20,7 @@ describe("#XUrl", () => {
         const urlBase = 'https://user:password@sub.domain.com:8000'
         const urlBaseNoCreds = 'https://sub.domain.com:8000'
         // шеллы need to be encoded and '\uDFFF' will cause an error if given to encodeURI
-        const urlTail = `/test/${ENCOD_CYRILLIC}/${ENCOD_SURROGATE}/${ENCOD_MALFORMED_SURROGATE}/?query=fish&filter=yellow`
+        const urlTail = `/test/${CYRILLIC.raw}/${SURROGATE.raw}/${MALFORMED_SURROGATE.raw}/?query=fish&filter=yellow`
 
         const testUrlData = {
             url: new URL(urlTail, urlBase),
@@ -84,9 +84,9 @@ describe("#XUrl", () => {
             ['http//missing-colon.com', undefined],
             ['http://domain.com:aaa', undefined],
             ['http://', undefined],
-            [`protocol-${ENCOD_CYRILLIC}:me@myhouse.tree`, undefined],
-            [`protocol-${ENCOD_SURROGATE}:me@myhouse.tree`, undefined],
-            [`protocol-${ENCOD_MALFORMED_SURROGATE}:me@myhouse.tree`, undefined],
+            [`protocol-${CYRILLIC.raw}:me@myhouse.tree`, undefined],
+            [`protocol-${SURROGATE.raw}:me@myhouse.tree`, undefined],
+            [`protocol-${MALFORMED_SURROGATE.raw}:me@myhouse.tree`, undefined],
             ['', undefined],
             [null, undefined],
             [undefined, undefined],
@@ -101,9 +101,9 @@ describe("#XUrl", () => {
             ['/', 'http//missing-colon.com'],
             ['/', 'http://domain.com:aaa'],
             ['/', 'http://'],
-            ['/', `protocol-${ENCOD_CYRILLIC}:me@myhouse.tree`],
-            ['/', `protocol-${ENCOD_SURROGATE}:me@myhouse.tree`],
-            ['/', `protocol-${ENCOD_MALFORMED_SURROGATE}:me@myhouse.tree`],
+            ['/', `protocol-${CYRILLIC.raw}:me@myhouse.tree`],
+            ['/', `protocol-${SURROGATE.raw}:me@myhouse.tree`],
+            ['/', `protocol-${MALFORMED_SURROGATE.raw}:me@myhouse.tree`],
             ['/', ''],
             ['/', 12345],
             ['/', {}],
@@ -228,61 +228,61 @@ describe("#XUrl", () => {
         const transformations = [
             (url: URL) => url.protocol = 'http:',
             (url: URL) => url.protocol = 'ftp', // without ':'
-            (url: URL) => url.protocol = `protocol-${ENCOD_CYRILLIC}:`,
-            (url: URL) => url.protocol = `protocol-${ENCOD_SURROGATE}:`,
-            (url: URL) => url.protocol = `protocol-${ENCOD_MALFORMED_SURROGATE}:`,
+            (url: URL) => url.protocol = `protocol-${CYRILLIC.raw}:`,
+            (url: URL) => url.protocol = `protocol-${SURROGATE.raw}:`,
+            (url: URL) => url.protocol = `protocol-${MALFORMED_SURROGATE.raw}:`,
 
             (url: URL) => url.username = 'jo:hn',
-            (url: URL) => url.username = `user-${ENCOD_CYRILLIC}`,
-            (url: URL) => url.username = `user-${ENCOD_SURROGATE}`,
-            (url: URL) => url.username = `user-${ENCOD_MALFORMED_SURROGATE}`,
+            (url: URL) => url.username = `user-${CYRILLIC.raw}`,
+            (url: URL) => url.username = `user-${SURROGATE.raw}`,
+            (url: URL) => url.username = `user-${MALFORMED_SURROGATE.raw}`,
             
             (url: URL) => url.password = 'doe@doe',
-            (url: URL) => url.password = `pass-${ENCOD_CYRILLIC}`,
-            (url: URL) => url.password = `pass-${ENCOD_SURROGATE}`,
-            (url: URL) => url.password = `pass-${ENCOD_MALFORMED_SURROGATE}`,
+            (url: URL) => url.password = `pass-${CYRILLIC.raw}`,
+            (url: URL) => url.password = `pass-${SURROGATE.raw}`,
+            (url: URL) => url.password = `pass-${MALFORMED_SURROGATE.raw}`,
             
             (url: URL) => url.host = 'other.example.com:8032',
-            (url: URL) => url.host = `${ENCOD_CYRILLIC}.example.com:8032`,
-            (url: URL) => url.host = `${ENCOD_SURROGATE}.example.com:8032`,
-            (url: URL) => url.host = `${ENCOD_MALFORMED_SURROGATE}.example.com:8032`,
+            (url: URL) => url.host = `${CYRILLIC.raw}.example.com:8032`,
+            (url: URL) => url.host = `${SURROGATE.raw}.example.com:8032`,
+            (url: URL) => url.host = `${MALFORMED_SURROGATE.raw}.example.com:8032`,
 
             (url: URL) => url.hostname = 'something.com',
-            (url: URL) => url.hostname = `something-${ENCOD_CYRILLIC}.com:8032`,
-            (url: URL) => url.hostname = `something-${ENCOD_SURROGATE}.com:8032`,
-            (url: URL) => url.hostname = `something-${ENCOD_MALFORMED_SURROGATE}.com:8032`,
+            (url: URL) => url.hostname = `something-${CYRILLIC.raw}.com:8032`,
+            (url: URL) => url.hostname = `something-${SURROGATE.raw}.com:8032`,
+            (url: URL) => url.hostname = `something-${MALFORMED_SURROGATE.raw}.com:8032`,
             
             (url: URL) => url.port = '8080',
             
             (url: URL) => url.pathname = '/newpath/',
             (url: URL) => url.pathname = 'otherpath', // without '/'
-            (url: URL) => url.pathname = `/path/${ENCOD_CYRILLIC}/`,
-            (url: URL) => url.pathname = `/path/${ENCOD_SURROGATE}/`,
-            (url: URL) => url.pathname = `/path/${ENCOD_MALFORMED_SURROGATE}/`,
+            (url: URL) => url.pathname = `/path/${CYRILLIC.raw}/`,
+            (url: URL) => url.pathname = `/path/${SURROGATE.raw}/`,
+            (url: URL) => url.pathname = `/path/${MALFORMED_SURROGATE.raw}/`,
             
             (url: URL) => url.search = '?newquery=1',
             (url: URL) => url.search = 'otherquery=2', // without '?'
-            (url: URL) => url.search = `?search=${ENCOD_CYRILLIC}`,
-            (url: URL) => url.search = `?search=${ENCOD_SURROGATE}`,
-            (url: URL) => url.search = `?search=${ENCOD_MALFORMED_SURROGATE}`,
+            (url: URL) => url.search = `?search=${CYRILLIC.raw}`,
+            (url: URL) => url.search = `?search=${SURROGATE.raw}`,
+            (url: URL) => url.search = `?search=${MALFORMED_SURROGATE.raw}`,
             
             (url: URL) => url.hash = '#section2',
             (url: URL) => url.hash = 'section3', // without '#'
-            (url: URL) => url.hash = `#${ENCOD_CYRILLIC}`,
-            (url: URL) => url.hash = `#${ENCOD_SURROGATE}`,
-            (url: URL) => url.hash = `#${ENCOD_MALFORMED_SURROGATE}`,
+            (url: URL) => url.hash = `#${CYRILLIC.raw}`,
+            (url: URL) => url.hash = `#${SURROGATE.raw}`,
+            (url: URL) => url.hash = `#${MALFORMED_SURROGATE.raw}`,
 
             (url: URL) => url.href = 'http://www.somewhere.zz/some/path?hello=world#cake',
             (url: URL) => url.href = 'http://www.somewhere.zz', // no tail
-            (url: URL) => url.href = `http://www.somewhere.zz/${ENCOD_CYRILLIC}/path?hello=world#cake`,
-            (url: URL) => url.href = `http://www.somewhere.zz/${ENCOD_SURROGATE}/path?hello=world#cake`,
-            (url: URL) => url.href = `http://www.somewhere.zz/${ENCOD_MALFORMED_SURROGATE}/path?hello=world#cake`,
-            (url: URL) => url.href = `http://www.somewhere.zz/path?hello=${ENCOD_CYRILLIC}#cake`,
-            (url: URL) => url.href = `http://www.somewhere.zz/path?hello=${ENCOD_SURROGATE}#cake`,
-            (url: URL) => url.href = `http://www.somewhere.zz/path?hello=${ENCOD_MALFORMED_SURROGATE}#cake`,
-            (url: URL) => url.href = `http://www.somewhere.zz/path?hello=world#${ENCOD_CYRILLIC}`,
-            (url: URL) => url.href = `http://www.somewhere.zz/path?hello=world#${ENCOD_SURROGATE}`,
-            (url: URL) => url.href = `http://www.somewhere.zz/path?hello=world#${ENCOD_MALFORMED_SURROGATE}`,
+            (url: URL) => url.href = `http://www.somewhere.zz/${CYRILLIC.raw}/path?hello=world#cake`,
+            (url: URL) => url.href = `http://www.somewhere.zz/${SURROGATE.raw}/path?hello=world#cake`,
+            (url: URL) => url.href = `http://www.somewhere.zz/${MALFORMED_SURROGATE.raw}/path?hello=world#cake`,
+            (url: URL) => url.href = `http://www.somewhere.zz/path?hello=${CYRILLIC.raw}#cake`,
+            (url: URL) => url.href = `http://www.somewhere.zz/path?hello=${SURROGATE.raw}#cake`,
+            (url: URL) => url.href = `http://www.somewhere.zz/path?hello=${MALFORMED_SURROGATE.raw}#cake`,
+            (url: URL) => url.href = `http://www.somewhere.zz/path?hello=world#${CYRILLIC.raw}`,
+            (url: URL) => url.href = `http://www.somewhere.zz/path?hello=world#${SURROGATE.raw}`,
+            (url: URL) => url.href = `http://www.somewhere.zz/path?hello=world#${MALFORMED_SURROGATE.raw}`,
             (url: URL) => url.href = 'tel:+9876543210', // with tel: protocol
             (url: URL) => url.href = 'mailto:me@myhouse.tree', // with mailto: protocol
         ]

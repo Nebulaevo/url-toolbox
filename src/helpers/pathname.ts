@@ -19,6 +19,5 @@ function assemblePathSegments(pathSegments: string[]): string {
 }
 
 export {
-    // _buildPathnameFromArray, // give up on this one (encode / decode URIError shenanigans)
     assemblePathSegments
 }
