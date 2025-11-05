@@ -61,7 +61,7 @@ describe("#ExtendedUrlMixin", () => {
         }
     })
 
-    it('"pathname" overridden setter accepts string arrays', () => {
+    it('"pathname" overridden setter handles string arrays', () => {
         const testData = [
             // empty array
             {   value: [],
