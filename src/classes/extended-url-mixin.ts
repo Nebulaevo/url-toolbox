@@ -149,12 +149,15 @@ class _ExtendedUrlMixin extends URL {
     // force TS to accept additionnal types
     // - string array
     set pathname(value: string|string[]) {
-        // 1. handling alternative types
-        if (isArray(value, {itemType:'string'})) {
+        // handling base case 
+        if (isString(value)) super.pathname = value
+
+        // handling alternative setter
+        else if (isArray(value, {itemType:'string'})) {
             super.pathname = assemblePathSegments(value)
         
-        } else if (isString(value)) super.pathname = value
-        else this.#throwAttrTypeError({
+        // blocking the operation for invalid value
+        } else this.#throwAttrTypeError({
             attr: 'pathname',
             acceptedTypes: 'string, or string array',
             value
