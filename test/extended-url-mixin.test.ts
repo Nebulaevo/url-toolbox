@@ -86,10 +86,10 @@ describe("#ExtendedUrlMixin", () => {
             },
             // encoding : surrogates (valid and invalid) mixed with ascii
             {   value: [`${SURROGATE.raw}-text`, `${MALFORMED_SURROGATE.raw}-other-text`],
-                result: `/${SURROGATE.encoded}-text/${MALFORMED_SURROGATE.encoded}-other-text/` // '/%F0%90%8F%BF-text/%EF%BF%BD-other-text/'
+                result: `/${SURROGATE.encoded}-text/${MALFORMED_SURROGATE.encoded}-other-text/`
             },
             {   value: [`text-${SURROGATE.raw}`, `other-text-${MALFORMED_SURROGATE.raw}`],
-                result: `/text-${SURROGATE.encoded}/other-text-${MALFORMED_SURROGATE.encoded}/` // '/%F0%90%8F%BF-text/%EF%BF%BD-other-text/'
+                result: `/text-${SURROGATE.encoded}/other-text-${MALFORMED_SURROGATE.encoded}/`
             },
             // special chars
             {   value: [`${SURROGATE.raw}-_.!~*'();,/\\?:@&=+$"\`# ${MALFORMED_SURROGATE.raw}`],
