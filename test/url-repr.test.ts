@@ -1,8 +1,11 @@
 import { describe, expect, it } from 'vitest'
 
 import RelativeUrl from '../src/classes/relative-url'
+import XUrl from '../src/classes/xurl'
 
 import { getTestInstances } from './helpers/get-test-instances'
+import UrlRepr from '../src/classes/url-repr'
+
 
 
 describe("#UrlRepr", () => {
@@ -140,7 +143,7 @@ describe("#UrlRepr", () => {
         }
     })
 
-    it('"filtered" & "normalised" : can generate filtered representations', () => {
+    it('"filtered representation" : of classic urls', () => {
 
         const {
             urlRepr, 
@@ -240,6 +243,207 @@ describe("#UrlRepr", () => {
             expect( urlRepr.filtered(filteringOpts) ).toBe(result)
             expect( xUrlRepr.filtered(filteringOpts) ).toBe(result)
             expect( relativeUrlRepr.filtered(filteringOpts) ).toBe(relativeUrlResult)
+
+            expect( urlRepr.normalised(filteringOpts) ).toBe(result)
+            expect( xUrlRepr.normalised(filteringOpts) ).toBe(result)
+            expect( relativeUrlRepr.normalised(filteringOpts) ).toBe(relativeUrlResult)
+        }
+    })
+
+    it('"filtered representation" : of host-less urls', () => {
+        
+        const normalisedTestData = [
+            {   filteringOpts: {
+                    baseMode: 'ALL', // checking base url filtering mode
+                    pathname: true,
+                    search: true,
+                    hash: true
+                },
+                cases: [
+                    {
+                        constructorArg: 'mailto:me@you.us',
+                        filteredResult: 'mailto:me@you.us'
+                    }, {
+                        constructorArg: 'tel:+1234567890',
+                        filteredResult: 'tel:+1234567890'
+                    }, {
+                        constructorArg: 'custom:something?q=a#1',
+                        filteredResult: 'custom:something?q=a#1'
+                    }
+                ]
+            },
+            {   filteringOpts: {
+                    baseMode: 'NO_PROTOCOL', // checking base url filtering mode
+                    pathname: true,
+                    search: true,
+                    hash: true
+                },
+                cases: [
+                    {
+                        constructorArg: 'mailto:me@you.us',
+                        filteredResult: 'me@you.us'
+                    }, {
+                        constructorArg: 'tel:+1234567890',
+                        filteredResult: '+1234567890'
+                    }, {
+                        constructorArg: 'custom:something?q=a#1',
+                        filteredResult: 'something?q=a#1'
+                    }
+                ]
+            },
+            {   filteringOpts: {
+                    baseMode: 'NO_CREDENTIALS', // checking base url filtering mode
+                    pathname: true,
+                    search: true,
+                    hash: true
+                },
+                cases: [
+                    {
+                        constructorArg: 'mailto:me@you.us',
+                        filteredResult: 'mailto:me@you.us'
+                    }, {
+                        constructorArg: 'tel:+1234567890',
+                        filteredResult: 'tel:+1234567890'
+                    }, {
+                        constructorArg: 'custom:something?q=a#1',
+                        filteredResult: 'custom:something?q=a#1'
+                    }
+                ]
+            },
+            {   filteringOpts: {
+                    baseMode: 'HOST_ONLY', // checking base url filtering mode
+                    pathname: true,
+                    search: true,
+                    hash: true
+                },
+                cases: [
+                    {
+                        constructorArg: 'mailto:me@you.us',
+                        filteredResult: 'me@you.us'
+                    }, {
+                        constructorArg: 'tel:+1234567890',
+                        filteredResult: '+1234567890'
+                    }, {
+                        constructorArg: 'custom:something?q=a#1',
+                        filteredResult: 'something?q=a#1'
+                    }
+                ]
+            },
+            {   filteringOpts: {
+                    baseMode: 'NO_BASE', // checking base url filtering mode
+                    pathname: true,
+                    search: true,
+                    hash: true
+                },
+                cases: [
+                    {
+                        constructorArg: 'mailto:me@you.us',
+                        filteredResult: 'me@you.us'
+                    }, {
+                        constructorArg: 'tel:+1234567890',
+                        filteredResult: '+1234567890'
+                    }, {
+                        constructorArg: 'custom:something?q=a#1',
+                        filteredResult: 'something?q=a#1'
+                    }
+                ]
+            },
+            {   filteringOpts: {
+                    baseMode: 'NO_BASE',
+                    pathname: false, // checking with no pathname
+                    search: true,
+                    hash: true
+                },
+                cases: [
+                    {
+                        constructorArg: 'mailto:me@you.us',
+                        filteredResult: ''
+                    }, {
+                        constructorArg: 'tel:+1234567890',
+                        filteredResult: ''
+                    }, {
+                        constructorArg: 'custom:something?q=a#1',
+                        filteredResult: '?q=a#1'
+                    }
+                ]
+            },
+            {   filteringOpts: {
+                    baseMode: 'NO_BASE',
+                    pathname: true,
+                    search: false, // checking with no search
+                    hash: true
+                },
+                cases: [
+                    {
+                        constructorArg: 'mailto:me@you.us',
+                        filteredResult: 'me@you.us'
+                    }, {
+                        constructorArg: 'tel:+1234567890',
+                        filteredResult: '+1234567890'
+                    }, {
+                        constructorArg: 'custom:something?q=a#1',
+                        filteredResult: 'something#1'
+                    }
+                ]
+            },
+            {   filteringOpts: {
+                    baseMode: 'NO_BASE',
+                    pathname: true,
+                    search: true,
+                    hash: false // checking with no hash
+                },
+                cases: [
+                    {
+                        constructorArg: 'mailto:me@you.us',
+                        filteredResult: 'me@you.us'
+                    }, {
+                        constructorArg: 'tel:+1234567890',
+                        filteredResult: '+1234567890'
+                    }, {
+                        constructorArg: 'custom:something?q=a#1',
+                        filteredResult: 'something?q=a'
+                    }
+                ]
+            },
+            {   filteringOpts: {
+                    baseMode: 'NO_BASE', // checking filtering out everything
+                    pathname: false,
+                    search: false,
+                    hash: false
+                },
+                cases: [
+                    {
+                        constructorArg: 'mailto:me@you.us',
+                        filteredResult: ''
+                    }, {
+                        constructorArg: 'tel:+1234567890',
+                        filteredResult: ''
+                    }, {
+                        constructorArg: 'custom:something?q=a#1',
+                        filteredResult: ''
+                    }
+                ]
+            },
+        ] as const
+
+        for (const {filteringOpts, cases} of normalisedTestData) {
+
+            for (const {constructorArg, filteredResult} of cases ) {
+                const url = new URL(constructorArg)
+                const xUrl = new XUrl(
+                    constructorArg, undefined, 
+                    {allowedProtocols: ['mailto', 'tel', 'custom']}
+                )
+
+                const urlRepr = new UrlRepr(url)
+                const xUrlRepr = new UrlRepr(xUrl)
+
+                expect( urlRepr.filtered(filteringOpts) ).toBe(filteredResult)
+                expect( urlRepr.normalised(filteringOpts) ).toBe(filteredResult)
+
+                expect( xUrlRepr.filtered(filteringOpts) ).toBe(filteredResult)
+                expect( xUrlRepr.normalised(filteringOpts) ).toBe(filteredResult)
+            }
         }
     })
 

@@ -70,6 +70,24 @@ function _urlCredentialsRepr(username: string, password: string): string {
     return credentials
 }
 
+
+function _hostlessProtocolBaseRepr(
+    baseMode: UrlRepr.BaseMode_T,
+    urlComponents: UrlRepr.UrlComponents_T
+): string {
+
+    // values for which the returned value should be empty
+    // (because for hostless protocols the base only includes the protocol)
+    if ( urlComponents.protocol === ''
+        || baseMode === 'NO_BASE'
+        || baseMode === 'NO_PROTOCOL'
+        || baseMode === 'HOST_ONLY'
+    ) return ''
+    
+    // ALL / NO_CREDENTIALS
+    return urlComponents.protocol
+}
+
 /** Returns a filtered representation of the URL base
  * 
  * @param baseMode (string) - allows to filter the URL base, can be :
@@ -87,8 +105,14 @@ function _urlBaseRepr(
     urlComponents: UrlRepr.UrlComponents_T
 ): string {
 
+    // if it's a RelativeUrl we don't even check the base
+    if (urlComponents.protocol === '') return ''
+
+    // if it's a host-less protocol (tel, mailto..) we handle it separately
+    if (urlComponents.host === '') return _hostlessProtocolBaseRepr(baseMode, urlComponents)
+
     if (baseMode === 'NO_BASE') return ''
-    
+
     const { host } = urlComponents
     if (baseMode === 'HOST_ONLY') return host
 

@@ -3,19 +3,14 @@
 
 Provides a collection of classes to extend or complete the built-in `URL` class.
 
-- 🔒 `XUrl` : to create secure restricted `URL` instances with custom whitelisted hosts and protocols
-
-- 👉 `RelativeUrl` : to create relative http / https `URL` instances, without any url base
-
-- 📷 `UrlRepr` : helper class providing representation methods for a `URL` instance
-
 ## Table of Contents
 
-- [Extended `URL` classes](#extended-url-classes--xurl--relativeurl)
-    - [`XUrl`](#xurl--for-absolute-urls)
-    - [`RelativeUrl`](#relativeurl-for-relative-httphttps-urls)
-- [Representation helper class : `UrlRepr`](#representation-helper-class--urlrepr)
-- [Additional types](#types)
+- 🛠️ [Extended `URL` classes](#extended-url-classes--xurl--relativeurl) with enhanced setters and representation helpers : 
+    - 🔒 [`XUrl`](#xurl--for-absolute-urls) : to create secure restricted `URL` instances with custom whitelisted hosts and protocols
+    - 👉 [`RelativeUrl`](#relativeurl-for-relative-httphttps-urls) : to create relative http / https `URL` instances, without any url base
+- 📷 [`UrlRepr`](#representation-helper-class--urlrepr) : helper class providing representation methods for a `URL` instance
+- 🫧 [Types](#types)
+
 
 ## Extended `URL` classes : `XUrl` & `RelativeUrl`
 
@@ -407,6 +402,36 @@ repr.normalised({
     baseMode: 'NO_BASE',
     hash: false
 }) // -> /path/?query1=value1&query2=value2
+```
+
+ℹ️ Remark : for "host-less" protocols like `mailto:`, or `tel:`, the only available part of the url base is the protocol.
+```js
+import { UrlRepr } from 'url-toolbox'
+
+const url = new URL('mailto:me@you.us')
+const repr = new UrlRepr(url)
+
+
+repr.normalised({
+    baseMode: 'NO_CREDENTIALS'
+}) // -> mailto:me@you.us
+
+repr.normalised({
+    baseMode: 'NO_PROTOCOL'
+}) // -> me@you.us
+
+repr.filtered({
+    baseMode: 'HOST_ONLY',
+}) // -> me@you.us
+
+repr.filtered({
+    baseMode: 'HOST_ONLY',
+    pathname: false
+}) // -> '' (because "me@you.us" is the pathname)
+
+
+
+
 ```
 
 ## Types
