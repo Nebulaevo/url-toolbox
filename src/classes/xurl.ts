@@ -1,6 +1,5 @@
 import { isArray, isBool } from "sniffly"
 
-import { canParseXUrl } from "../helpers/can-parse.js"
 import { 
     checkProtocol, 
     checkHost, 
@@ -25,7 +24,12 @@ class XUrl extends _ExtendedUrlMixin {
 
     /** Return true if given parameters can successfully generate a `XUrl` instance */
     static canParse(url: string|URL, base?: string|URL, restrictions?: Partial<XUrl.UrlRestrictions_T>) {
-        return canParseXUrl(url, base, restrictions)
+        try {
+            new XUrl(url, base, restrictions)
+            return true
+        } catch (err) {
+            return false
+        }
     }
 
     constructor(url: string|URL, base?: string|URL, restrictions?: Partial<XUrl.UrlRestrictions_T>) {
