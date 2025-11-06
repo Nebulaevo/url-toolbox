@@ -14,18 +14,13 @@ import {
 
 describe("#XUrl", () => {
     
-    it('"instance initialisation" : works with valid values', () => {
-        // (also checks if credentials restriction successfully filters credentials at creation time)
+    it('"initialisation" : with valid values, result is coherent with the native URL class', () => {
 
-        const urlBase = 'https://user:password@sub.domain.com:8000'
-        const urlBaseNoCreds = 'https://sub.domain.com:8000'
-        // шеллы need to be encoded and '\uDFFF' will cause an error if given to encodeURI
+        const urlBase = 'https://sub.domain.com:8000'
         const urlTail = `/test/${CYRILLIC.raw}/${SURROGATE.raw}/${MALFORMED_SURROGATE.raw}/?query=fish&filter=yellow`
 
         const testUrlData = {
             url: new URL(urlTail, urlBase),
-            urlNoCreds: new URL(urlTail, urlBaseNoCreds),
-            
             xUrl: new XUrl(urlTail, urlBase),
             relativeUrl: new RelativeUrl(urlTail),
 
@@ -63,19 +58,17 @@ describe("#XUrl", () => {
             for (const args of constructorArgs) {
                 const xUrlA = new XUrl(...args, restriction)
                 const xUrlB = XUrl.parse(...args, restriction)
-                const referenceUrl = restriction?.ignoreCredentials
-                    ? testUrlData.urlNoCreds
-                    : testUrlData.url
+                const referenceUrl = testUrlData.url
                 
                 expect(XUrl.canParse(...args)).toBe(true)
+                expect(xUrlB).toBeInstanceOf(XUrl) // not null
                 expect(instancesAreEquivalent(referenceUrl, xUrlA)).toBe(true)
-                expect(xUrlB).not.toBeNull()
                 expect(instancesAreEquivalent(referenceUrl, xUrlB!)).toBe(true)
             }
         }
     }) 
 
-    it('"instance initialisation" : fails with TypeError for invalid urls', () => {
+    it('"initialisation" : with invalid values, fails with TypeError', () => {
         const invalidConstructorArgs: [any, any][] = [
             // invalid urls with no base
             ['justastring', undefined],
@@ -115,14 +108,14 @@ describe("#XUrl", () => {
             expect(XUrl.parse(...invalidArgs)).toBe(null)
             expect(XUrl.canParse(...invalidArgs)).toBe(false)
 
-            // sanity checks verifying that URL behaves the same way
+            // sanity checks verifying that URL behaves the same way for given values
             expect(() => new URL(...invalidArgs)).toThrowError(TypeError)
             expect(URL.parse(...invalidArgs)).toBe(null)
             expect(URL.canParse(...invalidArgs)).toBe(false)
         }
     })
 
-    it('"instance initialisation" : fails with BrokenUrlRestrictionError if restrictions are broken', () => {
+    it('"initialisation" : protocol and host restrictions are enforced', () => {
 
         const testData: {
             restrictions: Partial<XUrl.UrlRestrictions_T>|undefined,
@@ -214,7 +207,34 @@ describe("#XUrl", () => {
                 expect(XUrl.canParse(...args, restrictions)).toBe(false)
             }
         }
-    }) 
+    })
+
+    it('"initialisation" : credentials filtering is applied', () => {
+        const urlBase = 'https://user:password@sub.domain.com:8000'
+        const urlBaseNoCreds = 'https://sub.domain.com:8000'
+        const urlTail = '/test/'
+        const referenceUrl = new URL(urlTail, urlBaseNoCreds)
+
+        const credentialRestriction = {ignoreCredentials: true} as const
+
+        const constructorArgs: [any, any, any][] = [
+            [urlBase+urlTail, undefined, credentialRestriction],
+            [urlTail, urlBase, credentialRestriction],
+            [new URL(urlTail, urlBase), undefined, credentialRestriction],
+            [new XUrl(urlTail, urlBase), undefined, credentialRestriction],
+            [new RelativeUrl(urlTail), urlBase, credentialRestriction]
+        ] as const
+
+        for (const args of constructorArgs) {
+            const xUrlA = new XUrl(...args)
+            const xUrlB = XUrl.parse(...args)
+
+            expect(XUrl.canParse(...args)).toBe(true) // presence of credentials should not prevent parsing
+            expect(xUrlB).toBeInstanceOf(XUrl)
+            expect(instancesAreEquivalent(referenceUrl, xUrlA)).toBe(true)
+            expect(instancesAreEquivalent(referenceUrl, xUrlB!)).toBe(true)
+        }
+    })
 
     it('"operations" : behaviour is coherent with the native URL class', () => {
         
@@ -300,7 +320,7 @@ describe("#XUrl", () => {
         }
     })
 
-    it('"protocol and host restrictions" : are enforced at modifcation time', () => {
+    it('"operations" : protocol and host restrictions are enforced', () => {
 
         const restrictions = {
             allowedProtocols: ['https:'],
@@ -335,7 +355,7 @@ describe("#XUrl", () => {
         }
     })
 
-    it('"credentials restriction" : filters out credentials at modification time', () => {
+    it('"operations" : credentials filtering is applied', () => {
 
         const restrictions = {
             ignoreCredentials: true
