@@ -18,8 +18,8 @@ function _failForNonHttpProtocol(protocol: string) {
 */
 class RelativeUrl extends _ExtendedUrlMixin {
 
-    static #DUMMY_PROTOCOL = 'http:'
-    static #DUMMY_HOST = 'relative-url.NotATld'
+    static #DUMMY_PROTOCOL = 'https:'
+    static #DUMMY_HOST = 'relative-url.InvalidTldValue'
     static #DUMMY_ORIGIN = `${RelativeUrl.#DUMMY_PROTOCOL}//${RelativeUrl.#DUMMY_HOST}`
 
     static parse(url: string|URL) {
@@ -45,25 +45,6 @@ class RelativeUrl extends _ExtendedUrlMixin {
         _failForNonHttpProtocol(super.protocol)
         this.#forceDummyBase()
     }
-
-    // #instanceSetUp() {
-    //     this.#forceDummyBase()
-
-    //     // Redefining ignored properties
-    //     const ignoredValueDescriptor = {
-    //         enumerable: false,
-    //         configurable: false,
-    //         writable: false,
-    //         value: ''
-    //     }
-        
-    //     // Object.defineProperty(this, 'protocol', ignoredValueDescriptor)
-    //     // Object.defineProperty(this, 'port', ignoredValueDescriptor)
-    //     // Object.defineProperty(this, 'username', ignoredValueDescriptor)
-    //     // Object.defineProperty(this, 'password', ignoredValueDescriptor)
-    //     // Object.defineProperty(this, 'host', ignoredValueDescriptor)
-    //     // Object.defineProperty(this, 'hostname', ignoredValueDescriptor)
-    // }
 
     #forceDummyBase() {
         super.protocol = RelativeUrl.#DUMMY_PROTOCOL

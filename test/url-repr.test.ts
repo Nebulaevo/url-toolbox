@@ -39,7 +39,7 @@ describe("#UrlRepr", () => {
             {   url: 'http://test.com/path#test',
                 result: {
                     pathname: '/path/',
-                    search: '' // with duplicated search param key
+                    search: ''
                 }
             },
             // missing '/' at the end of path + duplicated search param key

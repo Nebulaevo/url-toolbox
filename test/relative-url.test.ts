@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest'
 import RelativeUrl from '../src/classes/relative-url'
 import XUrl from '../src/classes/xurl'
 
-import { instancesAreEquivalent } from './helpers/instance-comparaison'
+import { instancesAreEquivalent, reprRelativeUrlWithHiddenAttrs } from './helpers/instance-comparaison'
 import {
     CYRILLIC,
     SURROGATE,
@@ -13,10 +13,9 @@ import {
 
 describe("#RelativeUrl", () => {
 
-    it('"instance initialisation" : works', () => {
+    it('"initialisation" : with valid values, result is coherent with the native URL class', () => {
         
         const urlBase = 'https://user:password@sub.domain.com:8000'
-        // шеллы need to be encoded and '\uDFFF' will cause an error if given to encodeURI
         const urlTail = `/test/${CYRILLIC.raw}/${SURROGATE.raw}/${MALFORMED_SURROGATE.raw}/?query=fish&filter=yellow`
         const fullUrl = urlBase + urlTail
         const referenceUrl = new URL(fullUrl)
@@ -34,8 +33,8 @@ describe("#RelativeUrl", () => {
             const relativeUrlB = RelativeUrl.parse(arg)
             
             expect(RelativeUrl.canParse(arg)).toBe(true)
+            expect(relativeUrlB).toBeInstanceOf(RelativeUrl)
             expect(instancesAreEquivalent(referenceUrl, relativeUrlA)).toBe(true)
-            expect(relativeUrlB).not.toBeNull()
             expect(instancesAreEquivalent(referenceUrl, relativeUrlB!)).toBe(true)
         }
     })
@@ -84,13 +83,21 @@ describe("#RelativeUrl", () => {
         }    
     })
 
-    it('"base url attributes" : return expected values', () => {
+    it('"base url attributes" : getters return expected values', () => {
         
         const relativeUrl = new RelativeUrl('https://bob:password123@some.where.gg:8008/sea/?query=fish#test')
 
         const testData = [
             {
                 operation: (url:URL) => url.href,
+                result: '/sea/?query=fish#test'
+            },
+            {
+                operation: (url:URL) => url.toJSON(),
+                result: '/sea/?query=fish#test'
+            },
+            {
+                operation: (url:URL) => url.toString(),
                 result: '/sea/?query=fish#test'
             },
             {
@@ -134,6 +141,7 @@ describe("#RelativeUrl", () => {
         const relativeUrl = new RelativeUrl(referenceUrl)
 
         const transformations = [
+            (url:URL) => url.href = 'https://bob:password123@some.where.gg:8008/sea/?query=fish#test',
             (url:URL) => url.protocol = 'ftp',
             (url:URL) => url.username = 'user',
             (url:URL) => url.password = 'password',
@@ -143,8 +151,10 @@ describe("#RelativeUrl", () => {
         ] as const
 
         for (const transform of transformations) {
+            const beforeTransformation = reprRelativeUrlWithHiddenAttrs(relativeUrl)
             transform(relativeUrl)
-            expect(instancesAreEquivalent(referenceUrl, relativeUrl)).toBe(true)
+            const afterTransformation = reprRelativeUrlWithHiddenAttrs(relativeUrl)
+            expect(afterTransformation).toBe(beforeTransformation)
         }    
     })
 })
