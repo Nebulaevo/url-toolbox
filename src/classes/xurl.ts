@@ -76,7 +76,7 @@ class XUrl extends _ExtendedUrlMixin {
         }   
     }
 
-    #restrictedSetter(kwargs: XUrl.RestrictedSetterKwargs_T) {
+    #restrictedSetter(kwargs: {setter: () => void, checks: () => void}) {
         // Taking snapshot in case of failure
         const snapshot = this.href
 
@@ -206,11 +206,7 @@ namespace XUrl {
         allowedHosts: string[] | undefined,
         ignoreCredentials: boolean
     }
-
-    export type RestrictedSetterKwargs_T = {
-        setter: () => void,
-        checks: () => void
-    }
 }
+
 
 export default XUrl
