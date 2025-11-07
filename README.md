@@ -9,7 +9,7 @@ Provides a collection of classes to extend or complete the built-in `URL` class.
     - 🔒 [`XUrl`](#xurl--for-absolute-urls) : to create secure restricted `URL` instances with custom whitelisted hosts and protocols
     - 👉 [`RelativeUrl`](#relativeurl-for-relative-httphttps-urls) : to create relative http / https `URL` instances, without any url base
 - 📷 [`UrlRepr`](#representation-helper-class--urlrepr) : helper class providing representation methods for a `URL` instance
-- 🫧 [Types](#types)
+- 🧮 [Types](#types)
 
 
 ## Extended `URL` classes : `XUrl` & `RelativeUrl`
@@ -428,9 +428,6 @@ repr.filtered({
     baseMode: 'HOST_ONLY',
     pathname: false
 }) // -> '' (because "me@you.us" is the pathname)
-
-
-
 
 ```
 
