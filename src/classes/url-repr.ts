@@ -70,22 +70,32 @@ function _urlCredentialsRepr(username: string, password: string): string {
     return credentials
 }
 
-
+/** Returns a filtered representation of the URL base for host-less protocols 
+ * (mailto:, tel: ...) which only include the protocol in the their base
+ * 
+ * @param baseMode (string) - allows to filter the URL base, can be :
+ * - `'ALL'` : includes only protocol
+ * - `'NO_PROTOCOL'` : returns an empty string as base
+ * - `'NO_CREDENTIALS'` : includes only protocol
+ * - `'HOST_ONLY'` : returns an empty string as base
+ * - `'NO_BASE'` : returns an empty string as base
+ * 
+ * @param protocol (string) - url protocol
+*/
 function _hostlessProtocolBaseRepr(
     baseMode: UrlRepr.BaseMode_T,
-    urlComponents: UrlRepr.UrlComponents_T
+    protocol: string
 ): string {
 
     // values for which the returned value should be empty
     // (because for hostless protocols the base only includes the protocol)
-    if ( urlComponents.protocol === ''
-        || baseMode === 'NO_BASE'
+    if ( baseMode === 'NO_BASE'
         || baseMode === 'NO_PROTOCOL'
         || baseMode === 'HOST_ONLY'
     ) return ''
     
     // ALL / NO_CREDENTIALS
-    return urlComponents.protocol
+    return protocol
 }
 
 /** Returns a filtered representation of the URL base
@@ -109,8 +119,12 @@ function _urlBaseRepr(
     if (urlComponents.protocol === '') return ''
 
     // if it's a host-less protocol (tel, mailto..) we handle it separately
-    if (urlComponents.host === '') return _hostlessProtocolBaseRepr(baseMode, urlComponents)
+    if (urlComponents.host === '') return _hostlessProtocolBaseRepr(
+        baseMode, urlComponents.protocol
+    )
 
+    // Generating url base depending on filtering options
+    // and available url components
     if (baseMode === 'NO_BASE') return ''
 
     const { host } = urlComponents
@@ -140,7 +154,7 @@ function _urlBaseRepr(
 
 /** Returns a filtered representation of the URL 
  * 
- * @param filteringOpts (optional object) - opts object allowing to filter out parts of the URL from the restul
+ * @param filteringOpts (optional object) - opts object allowing to filter out parts of the URL from the result
  * 
  * @param filteringOpts.baseMode (string, default `'NO_CREDENTIALS'`) - allows to filter the URL base, can be :
  * - `'ALL'` : includes protocol, credentials and host in the result
@@ -175,7 +189,10 @@ function _filteredUrlRepr(
 
 /** Class allowing to generate various representations of a URL */
 class UrlRepr {
+    /** represented `URL` instance */
     #url: URL
+
+    /** cached normalised attrs */
     #normalisedAttrs: UrlRepr.NormalisedAttrs_T
 
     constructor(url: URL) {

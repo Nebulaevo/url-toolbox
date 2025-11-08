@@ -15,7 +15,8 @@ Provides a collection of classes to extend or complete the built-in `URL` class.
 ## Extended `URL` classes : `XUrl` & `RelativeUrl`
 
 Both classes extend the native `URL` class with :
-- **An `as` attribute :**\
+
+➤ **An `as` attribute :**\
 Returns a `UrlRepr` instance linked to the current instance, providing multiple representation helpers for the url (see [Representation helper class : `UrlRepr`](#representation-helper-class--urlrepr))
 
 ```js
@@ -35,11 +36,39 @@ relativeUrl.as.filtered({
     search: false
 }) // -> /somewhere
 ```
+<br>
+
+➤ **A Type Restricted Constructor :**\
+    Constructor arguments are type-checked at execution time and will throw a `TypeError` if invalid, preventing common silent failures.
+
+| Class | Constructor Args & Allowed Types |
+| :--- | :----- |
+| `XUrl` | **url** : `string` or `URL` <br> **base** : `string`, `URL` or `undefined` <br> **restrictions** : `key/value object` or `undefiend` |
+| `RelativeUrl` | **url** : `string`, `URL` or `undefined` |
+
+```js
+import { XUrl, RelativeUrl } from 'url-toolbox'
+
+XUrl.canParse(
+    undefined, // invalid type
+    'http://test.com'
+) // -> false (invalid 'url' arg)
+
+XUrl.canParse(
+    'http://test.com/test/', // invalid type
+    undefined,
+    [1,2,3]
+) // -> false (invalid 'restrictions' arg)
+
+RelativeUrl.canParse( 0 ) // -> false (invalid 'url' arg)
+
+RelativeUrl.canParse( undefined ) // -> true (will default to '/')
+```
 
 <br>
 
-- **Extended Attribute Setters:**\
-    Attribute setters are overridden to throw a `TypeError` for invalid argument types, preventing common silent failures.\
+➤ **Extended Attribute Setters :**\
+    Attribute setters perform type-checks at execution time, and can throw a `TypeError` for invalid argument types, preventing common silent failures.\
     Additionnally, some attributes are extended with alternative setting options (`port`, `pathname` and `search`).
 
 | Attribute | Allowed Setter Values and their Behaviour |
@@ -53,6 +82,7 @@ relativeUrl.as.filtered({
 | `pathname` | ➤ **`string`** : calls default URL pathname setter<hr> ➤ **`string array`** : assembles a path from the given segments (usefull if building paths from dynamic values) |
 | `search` | ➤ **`string`** : calls default URL setter<hr> ➤ **`URLSearchParams` or `key/value object with string values`** : converted to a search string before calling the default URL search setter |
 | `hash` | ➤ **`string`** : calls default URL setter |
+| `href` | ➤ **`string`** : calls default URL setter for `XUrl` instances, or manually sets attribute values for `RelativeUrl` instances |
 
 Here are some examples to illustrate the additionnal type restrictions on attribute setters :
 ```js

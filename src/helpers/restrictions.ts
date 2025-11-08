@@ -9,7 +9,8 @@ const DEFAULT_PROTOCOL_WHITELIST = new Set([
     'mailto:', 'tel:', 'sms:',
 ])
 
-function toProtocolArray(protocolList: string[]) {
+/** @returns a new array of url protocols (formatted) */
+function formatAllowedProtocolsArray(protocolList: string[]) {
     return protocolList.map(item => {
         let protocol = item.trim()
         if (!protocol.endsWith(':')) {
@@ -19,6 +20,11 @@ function toProtocolArray(protocolList: string[]) {
     })
 }
 
+/** 
+ * @throws `BrokenUrlRestrictionError` if the url's protocol is not whitelisted 
+ * 
+ * (if no whitelist is provided the default one is used)
+*/
 function checkProtocol(url: URL, whitelist?: string[]) {
     const isAllowed = isArray(whitelist, {nonEmpty: true})
         ? whitelist.includes(url.protocol)
@@ -29,7 +35,11 @@ function checkProtocol(url: URL, whitelist?: string[]) {
     )
 }
 
-
+/** 
+ * @throws `BrokenUrlRestrictionError` if the url's host is not whitelisted 
+ * 
+ * (if no whitelist is provided all hosts are allowed)
+*/
 function checkHost(url: URL, whitelist?:string[]) {
     const isAllowed = isArray(whitelist, {nonEmpty: true})
         ? whitelist.includes(url.host)
@@ -41,7 +51,7 @@ function checkHost(url: URL, whitelist?:string[]) {
 }
 
 export {
-    toProtocolArray,
+    formatAllowedProtocolsArray,
     checkProtocol,
     checkHost,
 }
