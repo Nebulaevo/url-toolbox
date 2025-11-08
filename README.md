@@ -49,20 +49,33 @@ relativeUrl.as.filtered({
 ```js
 import { XUrl, RelativeUrl } from 'url-toolbox'
 
-XUrl.canParse(
+const url = new XUrl(
     undefined, // invalid type
     'http://test.com'
-) // -> false (invalid 'url' arg)
+) // -> throws TypeError
 
 XUrl.canParse(
-    'http://test.com/test/', // invalid type
+    10, // invalid type
+    'http://test.com'
+) // -> false
+
+XUrl.canParse(
+    'http://test.com/test/',
     undefined,
-    [1,2,3]
-) // -> false (invalid 'restrictions' arg)
+    [1,2,3] // invalid restrictions
+) // -> false
 
-RelativeUrl.canParse( 0 ) // -> false (invalid 'url' arg)
+const relativeUrl = new RelativeUrl( 
+    0 // invalid url
+) // -> throws TypeError
 
-RelativeUrl.canParse( undefined ) // -> true (will default to '/')
+RelativeUrl.canParse( 
+    [1, 2, 3] // invalid url
+) // -> false
+
+RelativeUrl.canParse( 
+    undefined // valid for relative url (will default to '/')
+) // -> true 
 ```
 
 <br>
