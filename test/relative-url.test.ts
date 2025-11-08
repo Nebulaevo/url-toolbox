@@ -39,6 +39,25 @@ describe("#RelativeUrl", () => {
         }
     })
 
+    it ('"initialisation" : overridden constructor restricts allowed arg types', () => {
+        const invalidConstructorArgs: any[] = [
+            0, 1, true, false,
+            [], {}
+        ]
+
+        for (const invalidArg of invalidConstructorArgs) {
+            expect(() => new RelativeUrl(invalidArg)).toThrowError(TypeError)
+            expect(RelativeUrl.parse(invalidArg)).toBe(null)
+            expect(RelativeUrl.canParse(invalidArg)).toBe(false)
+        }
+    })
+
+    it ('"initialisation" : accepts undefined', () => {
+        expect(new RelativeUrl(undefined).href).toBe('/')
+        expect(RelativeUrl.parse(undefined)?.href).toBe('/')
+        expect(RelativeUrl.canParse(undefined)).toBe(true)
+    })
+
     it('"operations" : behaviour is coherent with the native URL class', () => {
         
         const url = new URL('https://bob:password123@some.where.gg:8008/sea/?query=fish')

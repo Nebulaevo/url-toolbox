@@ -114,6 +114,35 @@ describe("#XUrl", () => {
             expect(URL.canParse(...invalidArgs)).toBe(false)
         }
     })
+    
+    it ('"initialisation" : overridden constructor restricts allowed arg types', () => {
+        const invalidConstructorArgs: [any, any, any][] = [
+            // invalid url
+            [undefined, 'https://test.com', {allowedProtocols: ['https'] }],
+            [1, 'https://test.com', {allowedProtocols: ['https'] }],
+            [true, 'https://test.com', {allowedProtocols: ['https'] }],
+            [[], 'https://test.com', {allowedProtocols: ['https'] }],
+            [{}, 'https://test.com', {allowedProtocols: ['https'] }],
+
+            // invalid base
+            ['/some/path/?q=a#1', 0, {allowedProtocols: ['https'] }],
+            ['/some/path/?q=a#1', true, {allowedProtocols: ['https'] }],
+            ['/some/path/?q=a#1', [], {allowedProtocols: ['https'] }],
+            ['/some/path/?q=a#1', {}, {allowedProtocols: ['https'] }],
+
+            // invalid restrictions
+            ['/some/path/?q=a#1', 'https://test.com', 0],
+            ['/some/path/?q=a#1', 'https://test.com', true],
+            ['/some/path/?q=a#1', 'https://test.com', []],
+            ['/some/path/?q=a#1', 'https://test.com', ''],
+        ]
+
+        for (const invalidArgs of invalidConstructorArgs) {
+            expect(() => new XUrl(...invalidArgs)).toThrowError(TypeError)
+            expect(XUrl.parse(...invalidArgs)).toBe(null)
+            expect(XUrl.canParse(...invalidArgs)).toBe(false)
+        }
+    })
 
     it('"initialisation" : protocol and host restrictions are enforced', () => {
 

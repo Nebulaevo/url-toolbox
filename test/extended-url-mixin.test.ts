@@ -162,7 +162,8 @@ describe("#ExtendedUrlMixin", () => {
             null, undefined,
             false, true,
             1, 0,
-            ['a'], {a: 'a'}
+            ['a'], {a: 'a'},
+            new URL('https://test.com/path'),
         ]
 
         const testData = [
@@ -204,7 +205,8 @@ describe("#ExtendedUrlMixin", () => {
                     null, undefined,
                     false, true,
                     ['a'], {a: 'a'},
-                    'aa', '0', '-2', 0, -2
+                    'aa', '0', '-2', 0, -2,
+                    new URL('https://test.com/path')
                 ]
             },
             {
@@ -214,7 +216,8 @@ describe("#ExtendedUrlMixin", () => {
                 invalidArgs: [
                     null, undefined,
                     false, true, 
-                    {a: 'a'}
+                    {a: 'a'},
+                    new URL('https://test.com/path')
                 ]
             },
             {
@@ -224,7 +227,8 @@ describe("#ExtendedUrlMixin", () => {
                 invalidArgs: [
                     null, undefined,
                     false, true, 
-                    ['a'], {a: '1', b:2}
+                    ['a'], {a: '1', b: 2},
+                    new URL('https://test.com/path')
                 ]
             },
             {
@@ -232,6 +236,17 @@ describe("#ExtendedUrlMixin", () => {
                 transform: (url:URL ,value: any) => url.hash = value,
                 // allows only string
                 invalidArgs: onlyStringInvalidArgs
+            },
+            {
+                classes: [XUrl, RelativeUrl],
+                transform: (url:URL ,value: any) => url.href = value,
+                // allows only string or URL
+                invalidArgs: [
+                    null, undefined,
+                    false, true,
+                    1, 0,
+                    ['a'], {a: 'a'},
+                ]
             }
         ]
 
