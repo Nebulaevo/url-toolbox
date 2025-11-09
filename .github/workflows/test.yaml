@@ -1,0 +1,28 @@
+name: Runing Tests
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  release:
+    types: [ created ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    container:
+      image: node:22
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          node-version: 22
+      
+      - name: Clean Install
+        run: npm ci
+      
+      - name: Build 
+        run: npm run build
+
+      - name: Run tests
+        run: npm run test
