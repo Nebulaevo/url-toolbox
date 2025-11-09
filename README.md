@@ -5,7 +5,7 @@ Provides a collection of classes to extend or complete the built-in `URL` class.
 
 ## Table of Contents
 
-- 🛠️ [Extended `URL` classes](#extended-url-classes--xurl--relativeurl) with enhanced setters and representation helpers : 
+- 🛠️ [Extended `URL` classes](#extended-url-classes--xurl--relativeurl) with enhanced setters and representation helpers :
     - 🔒 [`XUrl`](#xurl--for-absolute-urls) : to create secure restricted `URL` instances with custom whitelisted hosts and protocols
     - 👉 [`RelativeUrl`](#relativeurl-for-relative-httphttps-urls) : to create relative http / https `URL` instances, without any url base
 - 📷 [`UrlRepr`](#representation-helper-class--urlrepr) : helper class providing representation methods for a `URL` instance
@@ -38,12 +38,12 @@ relativeUrl.as.filtered({
 ```
 <br>
 
-➤ **A Type Restricted Constructor :**\
+➤ **A Type-Restricted Constructor :**\
     Constructor arguments are type-checked at execution time and will throw a `TypeError` if invalid, preventing common silent failures.
 
 | Class | Constructor Args & Allowed Types |
 | :--- | :----- |
-| `XUrl` | **url** : `string` or `URL` <br> **base** : `string`, `URL` or `undefined` <br> **restrictions** : `key/value object` or `undefiend` |
+| `XUrl` | **url** : `string` or `URL` <br> **base** : `string`, `URL` or `undefined` <br> **restrictions** : `key-value object` or `undefined` |
 | `RelativeUrl` | **url** : `string`, `URL` or `undefined` |
 
 ```js
@@ -82,7 +82,7 @@ RelativeUrl.canParse(
 
 ➤ **Extended Attribute Setters :**\
     Attribute setters perform type-checks at execution time, and can throw a `TypeError` for invalid argument types, preventing common silent failures.\
-    Additionnally, some attributes are extended with alternative setting options (`port`, `pathname` and `search`).
+    Additionally, some attributes are extended with alternative setting options (`port`, `pathname` and `search`).
 
 | Attribute | Allowed Setter Values and their Behaviour |
 | :--- | :----- |
@@ -92,12 +92,12 @@ RelativeUrl.canParse(
 | `host` | *✱ This restriction is only applied for `XUrl` instances as this attribute is ignored by `RelativeUrl` instances*<br><br>➤ **`string`** : calls default URL setter |
 | `hostname` | *✱ This restriction is only applied for `XUrl` instances as this attribute is ignored by `RelativeUrl` instances*<br><br>➤ **`string`** : calls default URL setter |
 | `port` | *✱ This restriction is only applied for `XUrl` instances as this attribute is ignored by `RelativeUrl` instances*<br><br>➤ **`number` or `string` (representing a positive number)** : checks that the given value can be converted to a valid integer before calling the default URL setter|
-| `pathname` | ➤ **`string`** : calls default URL pathname setter<hr> ➤ **`string array`** : assembles a path from the given segments (usefull if building paths from dynamic values) |
-| `search` | ➤ **`string`** : calls default URL setter<hr> ➤ **`URLSearchParams` or `key/value object with string values`** : converted to a search string before calling the default URL search setter |
+| `pathname` | ➤ **`string`** : calls default URL pathname setter<hr> ➤ **`string array`** : assembles a path from the given segments (useful if building paths from dynamic values) |
+| `search` | ➤ **`string`** : calls default URL setter<hr> ➤ **`URLSearchParams` or `key-value object with string values`** : converted to a search string before calling the default URL search setter |
 | `hash` | ➤ **`string`** : calls default URL setter |
 | `href` | ➤ **`string`** : calls default URL setter for `XUrl` instances, or manually sets attribute values for `RelativeUrl` instances |
 
-Here are some examples to illustrate the additionnal type restrictions on attribute setters :
+Here are some examples to illustrate the additional type restrictions on attribute setters :
 ```js
 import { XUrl, RelativeUrl } from 'url-toolbox'
 
@@ -105,7 +105,7 @@ const url = new XUrl('http://my-domain.com/path?query2=value2&query1=value1')
 const relativeUrl = new RelativeUrl('/somewhere?query2=value2&query1=value1')
 
 
-// Attempting to set a non expected value to an attribute setter
+// Attempting to set a non-expected value to an attribute setter
 // will throw a TypeError
 url.host = undefined // (expected string)
 url.port = '-10' // (expected positive number)
@@ -132,7 +132,7 @@ const relativeUrl = new RelativeUrl('/somewhere?query2=value2&query1=value1')
 url.port = 8000
 url.port // -> '8000'
 
-// pathanme can be set from a string array 
+// pathname can be set from a string array 
 // each path segment is encoded before being assembled
 url.pathname = ['single/path/segment', 'other']
 relativeUrl.pathname = ['this', 'is', 'my path']
@@ -141,7 +141,7 @@ url.pathname // /single%2Fpath%2Fsegment/other/
 relativeUrl.pathname // /this/is/my%20path/
 
 // search can be set from a URLSearchParams instance
-// or from a key/value pair object containing only string values
+// or from a key-value pair object containing only string values
 url.search = new URLSearchParams({
     newQuery: 'rabbits',
     filter: 'white'
@@ -175,14 +175,14 @@ import {BrokenUrlRestrictionError} from 'url-toolbox'
 
 #### 🟆 Restrictions Object Structure
 
-Restrictions are declared as a key/value object.\
+Restrictions are declared as a key-value object.\
 They are defined at instance creation, if no value is given for a key, the default value is used.
 
 | Key | Description | Default |
 | - | - | - |
-| `allowedProtocols` | *String array (optionnal)*<br>Defines whitelisted protocols.<br>(it's not possible to allow all protocols, if no allowed protocols are listed the default list is used)<br><br>Any attempt to use a non allowed protocol will throw a `BrokenUrlRestrictionError` | http:, https:, ftp:, sftp:, ws:, wss:, blob:, about:, mailto:, tel:, sms: |
-| `allowedHosts` | *String array (optionnal)*<br>Defines whitelisted hosts.<br>(should include eventual subdomain, and eventual port number, if applicable)<br><br>If defined and non empty, any attempt to use a non allowed host will throw a `BrokenUrlRestrictionError` | Not restricted |
-| `ignoreCredentials` | *Boolean (optionnal)*<br><br>If true, username and password values are erased and cannot be modified. Any attempt to set credentials anyway will be ignored but will not throw any error. | Allow credentials |
+| `allowedProtocols` | *String array (optional)*<br>Defines whitelisted protocols.<br>(it's not possible to allow all protocols, if no allowed protocols are listed the default list is used)<br><br>Any attempt to use a non-allowed protocol will throw a `BrokenUrlRestrictionError` | http:, https:, ftp:, sftp:, ws:, wss:, blob:, about:, mailto:, tel:, sms: |
+| `allowedHosts` | *String array (optional)*<br>Defines whitelisted hosts.<br>(should include eventual subdomain and eventual port number, if applicable)<br><br>If defined and non empty, any attempt to use a non-allowed host will throw a `BrokenUrlRestrictionError` | Not restricted |
+| `ignoreCredentials` | *Boolean (optional)*<br><br>If true, username and password values are erased and cannot be modified. Any attempt to set credentials anyway will be ignored but will not throw any error. | Allow credentials |
 
 #### 🟆 Creating and Modifying an Instance
 
@@ -210,12 +210,12 @@ const urlB = XUrl.parse(
     restrictions
 )
 
-// Those operations will throw an error
+// These operations will throw an error
 urlA.href = 'http://wrong-domain.com/path' // (wrong host)
 urlA.protocol = 'ftp:' // (wrong protocol)
 ```
 
-If given url doesn't respect protocol or host restrictions at intance creation, operation will also fail with `BrokenUrlRestrictionError`
+If the given url doesn't respect protocol or host restrictions at instance creation, operation will also fail with `BrokenUrlRestrictionError`
 
 ```js
 import { XUrl } from 'url-toolbox'
@@ -243,7 +243,7 @@ If credentials are ignored, any attempt to set username or password will be igno
 ```js
 import { XUrl } from 'url-toolbox'
 
-// None of theese methods will succeed at setting the credentials
+// None of these methods will succeed at setting the credentials
 const url = XUrl.parse(
     'https://user:password123@domain.com//test/path/',
     undefined,
@@ -287,7 +287,7 @@ To maintain coherence with the built-in `URL` API, the base url attribute setter
 #### 🟆 Instance Creation
 
 Instances can be created with `new` or `RelativeUrl.parse`, with a relative or an absolute url string.\
-If using an absolute url string, the protocol should be http:, or https:, use of any other protocol will fail with a `TypeError`.
+If using an absolute url string, the protocol should be http:, or https:, the use of any other protocol will fail with a `TypeError`.
 
 
 ```js
@@ -380,7 +380,7 @@ const urlRepr = new UrlRepr(url)
 ### Getting a Normalised Representation
 
 The `normalised` method allows to get a url representation that is easy to compare with another url. 
-The path and search params order is normalised to insure that most equivalent urls can be efficiently compared.
+The path and search params order is normalised to ensure that most equivalent urls can be efficiently compared.
 
 
 ```js
@@ -418,7 +418,7 @@ repr.normalisedSearch // -> ?query1=value1&query2=value2 (ordered keys)
 
 It's possible to filter the url parts in the representation by using the `filtered` method, or by providing filtering options to the `normalised` method.
 
-The filtering options argument is a key/value object allowing to filter the url parts included in a url representation (all keys are optional with default values).
+The filtering options argument is a key-value object allowing to filter the url parts included in a url representation (all keys are optional with default values).
 
 | Key | Description | Default |
 | --- | ----------- | ------- |

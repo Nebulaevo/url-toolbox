@@ -1,0 +1,7 @@
+.github/
+.vitest/
+src/
+test/
+tsconfig.json
+TODO.md
+.secrets
