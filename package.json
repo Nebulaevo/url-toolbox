@@ -1,10 +1,9 @@
 {
     "name": "url-toolbox",
-    "version": "1.0.1",
-    "description": "A TypeScript toolbox extending the URL API with normalization, restrictions, and utilities.",
+    "version": "1.0.2",
+    "description": "A TypeScript toolbox extending the native URL class with normalization, restrictions, and utilities.",
     "author": "Nebulaevo",
     "license": "MIT",
-    "keywords": [],
     "type": "module",
     "main": "dist/index.js",
     "types": "dist/index.d.ts",
@@ -28,5 +27,11 @@
     },
     "dependencies": {
         "sniffly": "^1.0.2"
-    }
+    },
+    "keywords": [
+        "url", "absolute", "relative", 
+        "secure", "restricted", 
+        "string representation", "normalised", "filtered", 
+        "typescript", "web"
+    ]
 }
