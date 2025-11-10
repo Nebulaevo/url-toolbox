@@ -1,4 +1,4 @@
-name: Runing Tests
+name: Tests
 
 on:
   push:
