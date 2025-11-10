@@ -1,6 +1,9 @@
 # 📬 URL Toolbox
 **The `URL` class, upgraded.**
 
+![](https://github.com/Nebulaevo/url-toolbox/actions/workflows/test.yaml/badge.svg)
+![](https://img.shields.io/badge/License-MIT-seagreen)
+
 Provides a collection of classes to extend or complete the built-in `URL` class.
 
 ## Table of Contents
