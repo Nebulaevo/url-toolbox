@@ -121,9 +121,9 @@ class XUrl extends _ExtendedUrlMixin {
      * if credentials are ignored for this instance */
     #applyCredentialsRestriction() {
         if (this.#restrictions.ignoreCredentials) {
-            // if restricted : we need to reach for the parent setters
-            super.username = ''
-            super.password = ''
+            // if restricted : calling the setter always sets the values to ''
+            this.username = ''
+            this.password = ''
         }
     }
 
@@ -134,7 +134,7 @@ class XUrl extends _ExtendedUrlMixin {
      * 3. In case of error (setter failed or checks detected a broken restriction) 
      * it rolls back to previous value before re-throwing the error
     */
-    #restrictedSetter(kwargs: {setter: () => void, checks: () => void}) {
+    #restrictedSetter(kwargs: {setter: () => void, checks: () => void, rollback: (snapshot:string) => void}) {
         // Taking snapshot in case of failure
         const snapshot = this.href
 
@@ -147,7 +147,7 @@ class XUrl extends _ExtendedUrlMixin {
             // in any case, probably faulty state, should be removed
 
             // Rollback
-            super.href = snapshot
+            kwargs.rollback(snapshot)
             throw err
         }
     }
@@ -171,8 +171,9 @@ class XUrl extends _ExtendedUrlMixin {
             // Forces values of credentials if not allowed
             this.#applyCredentialsRestriction()
         }
+        const rollback = (snapshot:string) => super.href = snapshot
 
-        this.#restrictedSetter({setter, checks})
+        this.#restrictedSetter({setter, checks, rollback})
         
     }
 
@@ -188,8 +189,9 @@ class XUrl extends _ExtendedUrlMixin {
         const checks = () => {
             checkProtocol(this, this.#restrictions.allowedProtocols)
         }
-        
-        this.#restrictedSetter({setter, checks})
+        const rollback = (snapshot:string) => super.href = snapshot
+
+        this.#restrictedSetter({setter, checks, rollback})
     }
 
     get username() {
@@ -197,8 +199,8 @@ class XUrl extends _ExtendedUrlMixin {
     }
 
     set username(value: string) {
-        if (this.#restrictions.ignoreCredentials) return
-        super.username = value
+        if (this.#restrictions.ignoreCredentials) super.username = ''
+        else super.username = value
     }
 
     get password() {
@@ -206,8 +208,8 @@ class XUrl extends _ExtendedUrlMixin {
     }
 
     set password(value: string) {
-        if (this.#restrictions.ignoreCredentials) return
-        super.password = value
+        if (this.#restrictions.ignoreCredentials) super.password = ''
+        else super.password = value
     }
 
     get hostname() {
@@ -222,8 +224,9 @@ class XUrl extends _ExtendedUrlMixin {
         const checks = () => {
             checkHost(this, this.#restrictions.allowedHosts)
         }
+        const rollback = (snapshot:string) => super.href = snapshot
         
-        this.#restrictedSetter({setter, checks})
+        this.#restrictedSetter({setter, checks, rollback})
     }
 
     get host() {
@@ -238,8 +241,9 @@ class XUrl extends _ExtendedUrlMixin {
         const checks = () => {
             checkHost(this, this.#restrictions.allowedHosts)
         }
+        const rollback = (snapshot:string) => super.href = snapshot
         
-        this.#restrictedSetter({setter, checks})
+        this.#restrictedSetter({setter, checks, rollback})
     }
 
     get port(): string {
@@ -256,8 +260,9 @@ class XUrl extends _ExtendedUrlMixin {
         const checks = () => {
             checkHost(this, this.#restrictions.allowedHosts)
         }
+        const rollback = (snapshot:string) => super.href = snapshot
         
-        this.#restrictedSetter({setter, checks})
+        this.#restrictedSetter({setter, checks, rollback})
     }
 }
 

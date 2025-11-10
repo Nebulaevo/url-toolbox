@@ -1,6 +1,6 @@
 {
     "name": "url-toolbox",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "description": "A TypeScript toolbox extending the URL API with normalization, restrictions, and utilities.",
     "author": "Nebulaevo",
     "license": "MIT",

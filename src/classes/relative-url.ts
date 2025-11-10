@@ -98,11 +98,6 @@ class RelativeUrl extends _ExtendedUrlMixin {
 
         // We override all the attributes describing the url base
         // (in case the given url was absolute)
-        this.#forceDummyBase()
-    }
-
-    /** Private method setting dummy values to the hidden atributes (related to the url base) */
-    #forceDummyBase() {
         super.protocol = RelativeUrl.#DUMMY_PROTOCOL
         super.host = RelativeUrl.#DUMMY_HOST
         super.port = ''
